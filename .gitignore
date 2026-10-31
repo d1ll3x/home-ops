@@ -14,3 +14,5 @@ talosconfig
 # Agents
 .claude/
 .mcp.json
+CLAUDE.md
+AGENTS.md

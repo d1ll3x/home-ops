@@ -20,3 +20,6 @@ CLUSTER_ETCD_CA_CRT = { provider = "bws", value = "CLUSTER_ETCD_CA_CRT" }
 CLUSTER_ETCD_CA_KEY = { provider = "bws", value = "CLUSTER_ETCD_CA_KEY" }
 CLUSTER_SERVICEACCOUNT_KEY = { provider = "bws", value = "CLUSTER_SERVICEACCOUNT_KEY" }
 CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "bws", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
+
+# Kubernetes Secrets
+K8S_CLUSTER_TOKEN = { provider = "bws", value = "K8S_CLUSTER_TOKEN" }
