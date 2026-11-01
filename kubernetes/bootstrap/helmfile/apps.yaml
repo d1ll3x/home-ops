@@ -43,7 +43,7 @@ releases:
           - --namespace={{ .Release.Namespace }}
           - --server-side
           - --force-conflicts
-          - --filename=../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/networking.yaml
+          - --filename=../../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/networking.yaml
         events:
           - postsync
         showlogs: true
@@ -68,26 +68,51 @@ releases:
     needs:
       - cert-manager/cert-manager
 
-  - name: bitwarden-secretsmanager
+  - name: bitwarden-secrets-manager
     namespace: external-secrets
     hooks:
       - # Wait for CRDs to be available
         command: kubectl
         args:
           - wait
-          - --for=create
+          - --for=condition=Established
           - crd/clustersecretstores.external-secrets.io
           - --timeout=2m
         events:
-          - postsync
+          - presync
         showlogs: true
-      - # Apply Resources
+
+      - # Issue the bitwarden-sdk-server TLS cert before its pod needs to mount it
+        command: kubectl
+        args:
+          - apply
+          - --namespace={{ .Release.Namespace }}
+          - --server-side
+          - --force-conflicts
+          - --filename=../../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/certificate.yaml
+        events:
+          - presync
+        showlogs: true
+
+      - # Wait for cert-manager to write the TLS secret
+        command: kubectl
+        args:
+          - wait
+          - --namespace={{ .Release.Namespace }}
+          - --for=create
+          - secret/bitwarden-tls-certs
+          - --timeout=2m
+        events:
+          - presync
+        showlogs: true
+
+      - # Apply ClusterSecretStore
         command: kubectl
         args:
           - apply
           - --server-side
           - --force-conflicts
-          - --filename=../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/clustersecretstore.yaml
+          - --filename=../../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/clustersecretstore.yaml
         events:
           - postsync
         showlogs: true
@@ -97,7 +122,7 @@ releases:
   - name: flux-operator
     namespace: flux-system
     needs:
-      - external-secrets/bitwarden-secretsmanager
+      - external-secrets/bitwarden-secrets-manager
 
   - name: flux-instance
     namespace: flux-system

@@ -1,25 +1,26 @@
 [providers]
 keychain = { type = "keychain", service = "fnox", prefix = "talos/" }
-bws = { type = "bitwarden-sm", project_id = "582cc0c9-2762-4769-9a35-b4da00ebcc1b" }
+talos = { type = "bitwarden-sm", project_id = "582cc0c9-2762-4769-9a35-b4da00ebcc1b" }  # Talos PKI, workstation only
+apps = { type = "bitwarden-sm", project_id = "eccb2bc4-37a0-4ba8-8d83-b4f500ed3aed" }   # kubernetes/apps: secret zero + in-cluster secrets
 
 [secrets]
 BWS_ACCESS_TOKEN = { provider = "keychain", value = "bws_access_token" }
 
 # Talos machine/cluster secrets, consumed by talos/*.j2 as {{ ENV.<name> }}
-MACHINE_CA_CRT = { provider = "bws", value = "MACHINE_CA_CRT" }
-MACHINE_CA_KEY = { provider = "bws", value = "MACHINE_CA_KEY" }
-MACHINE_TOKEN = { provider = "bws", value = "MACHINE_TOKEN" }
-CLUSTER_ID = { provider = "bws", value = "CLUSTER_ID" }
-CLUSTER_SECRET = { provider = "bws", value = "CLUSTER_SECRET" }
-CLUSTER_TOKEN = { provider = "bws", value = "CLUSTER_TOKEN" }
-CLUSTER_CA_CRT = { provider = "bws", value = "CLUSTER_CA_CRT" }
-CLUSTER_CA_KEY = { provider = "bws", value = "CLUSTER_CA_KEY" }
-CLUSTER_AGGREGATORCA_CRT = { provider = "bws", value = "CLUSTER_AGGREGATORCA_CRT" }
-CLUSTER_AGGREGATORCA_KEY = { provider = "bws", value = "CLUSTER_AGGREGATORCA_KEY" }
-CLUSTER_ETCD_CA_CRT = { provider = "bws", value = "CLUSTER_ETCD_CA_CRT" }
-CLUSTER_ETCD_CA_KEY = { provider = "bws", value = "CLUSTER_ETCD_CA_KEY" }
-CLUSTER_SERVICEACCOUNT_KEY = { provider = "bws", value = "CLUSTER_SERVICEACCOUNT_KEY" }
-CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "bws", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
+MACHINE_CA_CRT = { provider = "talos", value = "MACHINE_CA_CRT" }
+MACHINE_CA_KEY = { provider = "talos", value = "MACHINE_CA_KEY" }
+MACHINE_TOKEN = { provider = "talos", value = "MACHINE_TOKEN" }
+CLUSTER_ID = { provider = "talos", value = "CLUSTER_ID" }
+CLUSTER_SECRET = { provider = "talos", value = "CLUSTER_SECRET" }
+CLUSTER_TOKEN = { provider = "talos", value = "CLUSTER_TOKEN" }
+CLUSTER_CA_CRT = { provider = "talos", value = "CLUSTER_CA_CRT" }
+CLUSTER_CA_KEY = { provider = "talos", value = "CLUSTER_CA_KEY" }
+CLUSTER_AGGREGATORCA_CRT = { provider = "talos", value = "CLUSTER_AGGREGATORCA_CRT" }
+CLUSTER_AGGREGATORCA_KEY = { provider = "talos", value = "CLUSTER_AGGREGATORCA_KEY" }
+CLUSTER_ETCD_CA_CRT = { provider = "talos", value = "CLUSTER_ETCD_CA_CRT" }
+CLUSTER_ETCD_CA_KEY = { provider = "talos", value = "CLUSTER_ETCD_CA_KEY" }
+CLUSTER_SERVICEACCOUNT_KEY = { provider = "talos", value = "CLUSTER_SERVICEACCOUNT_KEY" }
+CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "talos", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
 
-# Kubernetes Secrets
-K8S_CLUSTER_TOKEN = { provider = "bws", value = "K8S_CLUSTER_TOKEN" }
+# Secret zero, consumed by bootstrap/kustomize/external-secrets/secret.yaml
+K8S_CLUSTER_TOKEN = { provider = "apps", value = "K8S_CLUSTER_TOKEN" }

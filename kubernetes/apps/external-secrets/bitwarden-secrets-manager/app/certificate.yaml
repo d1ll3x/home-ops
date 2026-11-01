@@ -1,0 +1,55 @@
+---
+# Self-signed root: only used to sign the CA below
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/issuer_v1.json
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: bitwarden-selfsigned
+spec:
+  selfSigned: {}
+---
+# Long-lived CA: its ca.crt stays stable while the leaf below rotates
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bitwarden-ca
+spec:
+  isCA: true
+  commonName: bitwarden-ca
+  secretName: bitwarden-ca
+  duration: 87600h
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    kind: Issuer
+    name: bitwarden-selfsigned
+---
+# Namespaced CA issuer: reads bitwarden-ca from its own namespace
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/issuer_v1.json
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: bitwarden-ca
+spec:
+  ca:
+    secretName: bitwarden-ca
+---
+# Serving cert the bitwarden-sdk-server chart mounts (image.tls.secretName)
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bitwarden-tls-certs
+spec:
+  secretName: bitwarden-tls-certs
+  dnsNames:
+    - bitwarden-sdk-server.external-secrets.svc.cluster.local
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  issuerRef:
+    kind: Issuer
+    name: bitwarden-ca
