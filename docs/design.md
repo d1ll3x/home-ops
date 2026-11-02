@@ -30,6 +30,7 @@ A Talos cluster, configured for three control-plane nodes that also run workload
 | Cloudflare | Only for cert-manager DNS-01 (wildcard `*.<domain>`) | Public zone required for Let's Encrypt |
 | Network resolver | Stays **outside** the cluster (move Technitium to the RPi5 later) | A single-node cluster must not take down the house's DNS |
 | Flux source | Public GitHub repo, anonymous HTTPS | Secret zero stays at one secret |
+| Private values | Domain, LAN layout and ASNs live in BWS as `SECRET_<ROLE>`; Flux substitutes them from `cluster-secrets`, Talos reads them via fnox; docs use `<role>` placeholders | A public repo must not map my network or name me ([ADR-0008](adr/0008-private-values-from-secrets.md)) |
 
 **Deliberate deviations from home-ops:**
 - minijinja templates + fnox instead of 1Password (`op://` refs → `{{ ENV.X }}`)
@@ -43,7 +44,7 @@ A Talos cluster, configured for three control-plane nodes that also run workload
 - Node addresses come from **DHCP reservations**; Talos has no static fallback, so if UniFi DHCP is down at boot, the node has no address.
 - Every app has the same shape: `apps/<ns>/<app>/ks.yaml` (Flux Kustomization: path, targetNamespace, dependsOn) and `app/{kustomization,ocirepository,helmrelease}.yaml`. helmfile reads chart url/tag from `ocirepository.yaml` and values from `helmrelease.yaml`, so bootstrap and Flux share one source of truth.
 - Flux `Kustomization` objects live in their app's namespace. A `dependsOn` across namespaces needs both `name:` and `namespace:`.
-- No `postBuild.substituteFrom` and no Flux-side SOPS (`decryption` blocks, `sops-age` Secret). Write `<domain>` literally.
+- No Flux-side SOPS (`decryption` blocks, `sops-age` Secret). Private values are written as `${SECRET_<ROLE>}` and substituted from the `cluster-secrets` Secret ([ADR-0008](adr/0008-private-values-from-secrets.md)); never write the domain, IPs or ASNs literally.
 - Flux pulls `https://github.com/d1ll3x/homeops-talos.git`, branch `main`, path `kubernetes/flux/cluster`, anonymously. Push before Flux can see a change.
 - Never run `talosctl gen secrets`: it creates a new, incompatible Talos PKI.
 
@@ -66,7 +67,7 @@ The five failure modes most likely to bite, and the issue that tests each:
 - **ISO:** Talos 1.14.1 on a Ventoy USB stick (shows up as `sdb`; pull it before apply). Installer image: `talos_version` in `kubernetes/talos/version.yaml`
 - **BIOS:** UEFI, SATA **AHCI**, Secure Boot off
 
-Network and hardware values are masked for privacy: each `<placeholder>` names a role, not a value. The real values live in the configs that use them, so ADRs and plans can reason about roles without publishing the LAN layout or the domain.
+Network and hardware values are masked for privacy: each `<placeholder>` names a role, not a value. `<kube-api-ip>` is the BWS secret `SECRET_KUBE_API_IP`, written `${SECRET_KUBE_API_IP}` in manifests and `{{ ENV.SECRET_KUBE_API_IP }}` in Talos templates ([ADR-0008](adr/0008-private-values-from-secrets.md)).
 
 | Item | Value |
 |---|---|
@@ -100,13 +101,14 @@ graph LR
   ESO --> BWA[(Bitwarden SM<br/>kubernetes/apps)]
   ESO --> S1[cloudflare-api-token]
   ESO --> S2[technitium-tsig-key]
+  ESO --> S3[cluster-secrets<br/>every namespace]
 ```
 
 - **Workstation:** `fnox.toml` holds references only. `BWS_ACCESS_TOKEN` (machine account `mandalore`) comes from the OS keychain (fnox `keychain` provider, prefix `talos/`); the 14 Talos PKI values come from BWS project `kubernetes/talos` (provider `talos`), under home-ops' names (`MACHINE_CA_CRT`, …, `CLUSTER_SECRETBOXENCRYPTIONSECRET`).
 - **Rendering:** `just talos render-config <node>` runs `fnox exec -- minijinja-cli` on the three layers, combines them with `talosctl machineconfig patch` and prints the result; `apply-node` pipes it into `talosctl apply-config -f /dev/stdin`. A failed layer inside `<( )` isn't caught by bash: read the `--dry-run` diff before every apply. `strict` (in `.minijinja.toml`) fails on any missing secret instead of rendering `null`.
 - **The Talos PKI lives only in BWS.** `talosconfig` (gitignored) was generated from the same secrets and still works.
 - **Secret zero:** the `ESO` machine account's token, read-only on `kubernetes/apps`, stored there for fnox's `apps` provider. The `base` stage of `just bootstrap cluster` renders `kubernetes/bootstrap/kustomize/external-secrets/secret.yaml` and applies it server-side before ESO is installed ([ADR-0004](adr/0004-secret-zero-cluster-machine-account.md)).
-- **In-cluster:** BWS project `kubernetes/apps` holds `cloudflare-api-token` (Zone DNS:Edit on `<domain>`) and `technitium-tsig-key`; the `bitwarden-secrets-manager` ClusterSecretStore syncs them.
+- **In-cluster:** BWS project `kubernetes/apps` holds `cloudflare-api-token` (Zone DNS:Edit on `<domain>`), `technitium-tsig-key` and the `SECRET_<ROLE>` private values; the `bitwarden-secrets-manager` ClusterSecretStore syncs them. The `cluster-secrets` ClusterExternalSecret puts the private values in every namespace for Flux substitution.
 - **Leak guards:** `.gitignore` covers `secrets.yaml`, `talosconfig`, `kubeconfig`, keys and `.env`. For Claude Code there are Read deny rules plus a PreToolUse hook (`~/.claude/hooks/block-secret-leaks.sh`) that blocks commands that would print secret values.
 - **Single point of failure:** the `mandalore` token. On a fresh workstation it has to be recovered from Bitwarden and put into the keychain before anything renders.
 

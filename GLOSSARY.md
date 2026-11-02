@@ -60,6 +60,10 @@ _Avoid_: bootstrap secret, seed secret
 A secret synced into Kubernetes from the `kubernetes/apps` BWS project by External Secrets Operator.
 _Avoid_: app secret, k8s secret (when meaning the source)
 
+**Private value**:
+A value that isn't a credential but maps my network or names me: the domain, subnets, IPs, VLAN IDs, ASNs. Stored in BWS as `SECRET_<ROLE>`, written as `${SECRET_<ROLE>}` in manifests and `<role>` in docs.
+_Avoid_: config value, setting, secret (when meaning a credential)
+
 ## Storage
 
 **miroir pool**:
