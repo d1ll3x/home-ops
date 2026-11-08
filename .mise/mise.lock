@@ -323,6 +323,9 @@ aube = { path = "locks/oxfmt/0.75.0", digest = "sha256:1d4f470a5dbba272218132db6
 backend = "npm:oxfmt"
 specifiers = ["0.75.0"]
 
+[tools.oxfmt.provenance]
+repository = "github.com/oxc-project/oxc"
+
 [[tools.talosctl]]
 version = "1.14.4"
 backend = "aqua:siderolabs/talos"

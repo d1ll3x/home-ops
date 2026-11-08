@@ -18,7 +18,7 @@ releases:
     namespace: observability
 
   - name: kopiur
-    namespace: system
+    namespace: kopiur-system
 
   - name: kube-prometheus-stack
     namespace: observability

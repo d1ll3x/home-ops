@@ -1,7 +1,7 @@
 [providers]
 keychain = { type = "keychain", service = "fnox", prefix = "talos/" }
-talos = { type = "bitwarden-sm", project_id = "582cc0c9-2762-4769-9a35-b4da00ebcc1b" }  # Talos PKI, workstation only
-apps = { type = "bitwarden-sm", project_id = "eccb2bc4-37a0-4ba8-8d83-b4f500ed3aed" }   # kubernetes/apps: secret zero + in-cluster secrets
+talos = { type = "bitwarden-sm", project_id = "582cc0c9-2762-4769-9a35-b4da00ebcc1b" } # Talos PKI, workstation only
+apps = { type = "bitwarden-sm", project_id = "eccb2bc4-37a0-4ba8-8d83-b4f500ed3aed" }  # kubernetes/apps: secret zero + in-cluster secrets
 
 [secrets]
 BWS_ACCESS_TOKEN = { provider = "keychain", value = "bws_access_token" }
