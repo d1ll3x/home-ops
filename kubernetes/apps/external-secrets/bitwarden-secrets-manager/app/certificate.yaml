@@ -33,9 +33,6 @@ spec:
   ca:
     secretName: bitwarden-ca
 ---
-# Serving cert the bitwarden-sdk-server chart mounts (image.tls.secretName).
-# dnsName matches the chart's Service (fullnameOverride: bitwarden-sdk-server)
-# and the ClusterSecretStore's bitwardenServerSDKURL.
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
 apiVersion: cert-manager.io/v1
 kind: Certificate
