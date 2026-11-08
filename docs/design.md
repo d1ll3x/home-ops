@@ -97,7 +97,7 @@ graph LR
   FNOX -- "env vars" --> MJ[minijinja-cli<br/>kubernetes/talos/*.j2]
   MJ --> R[talosctl machineconfig patch<br/>stdout, never on disk]
   R -- "pipe" --> TC[talosctl apply-config -f /dev/stdin]
-  FNOX -- "secret zero" --> K8S[Secret bitwarden-access-token<br/>external-secrets ns]
+  FNOX -- "secret zero" --> K8S[Secret eso-access-token<br/>external-secrets ns]
   K8S --> ESO[External Secrets Operator<br/>+ bitwarden-sdk-server]
   ESO --> BWA[(Bitwarden SM<br/>kubernetes/apps)]
   ESO --> S1[cloudflare-api-token]

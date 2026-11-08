@@ -1,9 +1,4 @@
 ---
-# No cycle with bitwarden-secrets-manager: the ACME ClusterIssuer turns Ready
-# once its Let's Encrypt account registers, which needs no secret. The
-# Cloudflare ExternalSecret is deliberately not health-checked (no `wait`);
-# ESO retries it until the ClusterSecretStore is Valid. Health-checking it
-# would make this Kustomization wait on Bitwarden, which waits on this one.
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
