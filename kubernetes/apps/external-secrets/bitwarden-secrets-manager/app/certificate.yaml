@@ -1,4 +1,12 @@
 ---
+# Internal PKI for bitwarden-sdk-server, adapted from
+# https://github.com/external-secrets/bitwarden-sdk-server/tree/main/hack
+# Same chain (self-signed -> CA -> leaf), but namespaced Issuers instead of
+# ClusterIssuers: only the ESO controller calls sdk-server, so nothing else
+# needs to trust this CA, and every object stays in external-secrets.
+# Needs only the cert-manager controller, no secrets: this is what breaks the
+# cert-manager <-> Bitwarden cycle.
+#
 # Self-signed root: only used to sign the CA below
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/issuer_v1.json
 apiVersion: cert-manager.io/v1
@@ -36,7 +44,9 @@ spec:
   ca:
     secretName: bitwarden-ca
 ---
-# Serving cert the bitwarden-sdk-server chart mounts (image.tls.secretName)
+# Serving cert the bitwarden-sdk-server chart mounts (image.tls.secretName).
+# dnsName matches the chart's Service (fullnameOverride: bitwarden-sdk-server)
+# and the ClusterSecretStore's bitwardenServerSDKURL.
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
 apiVersion: cert-manager.io/v1
 kind: Certificate
