@@ -23,4 +23,6 @@ CLUSTER_SERVICEACCOUNT_KEY = { provider = "talos", value = "CLUSTER_SERVICEACCOU
 CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "talos", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
 
 # Secret zero, consumed by bootstrap/kustomize/external-secrets/secret.yaml
-BWS_K8S_FLUX = { provider = "apps", value = "BWS_K8S_FLUX" }
+bitwarden-access-token = { provider = "apps", value = "bitwarden-access-token" }
+cloudflare-issuer-secret = { provider = "apps", value = "cloudflare-issuer-secret" }
+github-webhook-token = { provider = "apps", value = "github-webook-token" }
