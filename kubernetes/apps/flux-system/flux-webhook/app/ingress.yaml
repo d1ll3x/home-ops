@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/ingress_v1.json
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flux-webhook
+  annotations:
+    tailscale.com/funnel: "true"
+    tailscale.com/tags: tag:flux-webhook
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - flux-webhook
+  rules:
+    - http:
+        paths:
+          - path: /hook/
+            pathType: Prefix
+            backend:
+              service:
+                name: webhook-receiver
+                port:
+                  number: 80
