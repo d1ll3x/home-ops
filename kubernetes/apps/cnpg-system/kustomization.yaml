@@ -6,7 +6,7 @@ namespace: cnpg-system
 
 components:
   - ../../components/alerts
+  - ../../components/namespace
 
 resources:
-  - ./namespace.yaml
   - ./cloudnative-pg/ks.yaml

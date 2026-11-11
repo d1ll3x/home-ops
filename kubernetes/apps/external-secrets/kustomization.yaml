@@ -6,8 +6,8 @@ namespace: external-secrets
 
 components:
   - ../../components/alerts
+  - ../../components/namespace
 
 resources:
-  - ./namespace.yaml
   - ./external-secrets/ks.yaml
   - ./bitwarden-secrets-manager/ks.yaml
