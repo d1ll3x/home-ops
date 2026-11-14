@@ -6,10 +6,10 @@ metadata:
   name: unifi
 spec:
   interval: 1h
-  path: ./kubernetes/apps/network/unifi/app
+  path: ./kubernetes/apps/external-dns/unifi/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: network
+  targetNamespace: external-dns

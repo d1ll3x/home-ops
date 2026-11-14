@@ -12,7 +12,7 @@ defaultInherit: default
 
 releases:
   - name: envoy-gateway
-    namespace: network
+    namespace: envoy-gateway-system
 
   - name: grafana-operator
     namespace: observability
