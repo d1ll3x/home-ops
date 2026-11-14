@@ -1,5 +1,7 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.toolkit.fluxcd.io/helmrepository_v1.json
+# Tailscale helm charts have no OCI support.
+# See https://github.com/tailscale/tailscale/issues/15536
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
