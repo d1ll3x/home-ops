@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
+# Served by the Gateways; must live in their namespace (certificateRefs without a namespace).
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard
+spec:
+  dnsNames:
+    - tebbenet.nl
+    - "*.tebbenet.nl"
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-production
+  privateKey:
+    algorithm: ECDSA
+  secretName: wildcard-tls
+  usages:
+    - digital signature
