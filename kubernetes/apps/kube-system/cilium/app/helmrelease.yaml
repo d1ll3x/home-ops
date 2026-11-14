@@ -29,7 +29,10 @@ spec:
       exclusive: false
     dashboards:
       enabled: true
-    devices: bond+
+    # tailscale0: tailnet traffic to LoadBalancer IPs arrives there, and Cilium only load-balances on its own devices
+    devices:
+      - bond+
+      - tailscale0
     enableIPv4BIGTCP: true
     endpointRoutes:
       enabled: true
@@ -56,6 +59,8 @@ spec:
       serviceTopology: true # spegel-registry relies on trafficDistribution: PreferSameNode
     localRedirectPolicies:
       enabled: true
+    # Pin to bond0's jumbo MTU; auto-detection would size pods for tailscale0's 1280
+    MTU: 9000
     operator:
       dashboards:
         enabled: true
