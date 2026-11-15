@@ -36,11 +36,11 @@ kubernetes:
 [private]
 kubeconfig lb="cilium":
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    if ! talosctl kubeconfig -n "{{ controller }}" -f --force-context-name kotor {{ justfile_dir() }}; then
+    if ! talosctl kubeconfig -n "{{ controller }}" -f --force-context-name odysseus {{ justfile_dir() }}; then
       just log fatal "Failed to fetch kubeconfig" "stage" "{{ recipe_name() }}"
     fi
     if [[ "{{ lb }}" != "cilium" ]]; then
-      if ! kubectl config set-cluster kotor --server "https://{{ controller }}:6443"; then
+      if ! kubectl config set-cluster odysseus --server "https://{{ controller }}:6443"; then
         just log fatal "Failed to set kubectl cluster server address" "stage" "{{ recipe_name() }}"
       fi
     fi
@@ -83,4 +83,3 @@ nodes-ready:
             sleep 5
         done
     fi
-

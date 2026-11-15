@@ -25,10 +25,19 @@ provisioning:
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
-hostname: revan
+hostname: nautilus
 ---
 apiVersion: v1alpha1
 kind: KubeNodeConfig
 labels:
   topology.kubernetes.io/zone: servers
-
+---
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: tailscale
+environment:
+  - TS_AUTHKEY={{ ENV.CLUSTER_TS_AUTHKEY }}
+  - TS_HOSTNAME=nautilus
+  - TS_ROUTES=192.168.21.69/32,192.168.21.100/32,192.168.20.200/32,192.168.20.201/32,192.168.20.202/32
+  - TS_ACCEPT_DNS=false
+  - TS_AUTH_ONCE=true
