@@ -14,7 +14,7 @@ spec:
       kind: CustomResourceDefinition
       name: dnsendpoints.externaldns.k8s.io
   interval: 1h
-  path: ./kubernetes/apps/network/cloudflare/app
+  path: ./kubernetes/apps/external-dns/cloudflare/app
   prune: true
   sourceRef:
     kind: GitRepository

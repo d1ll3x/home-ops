@@ -14,12 +14,12 @@ spec:
     provider:
       name: cloudflare
     env:
-      - name: &name CLOUDFLARE_API_TOKEN
+      - name: &name CF_API_TOKEN
         valueFrom:
           secretKeyRef:
             name: &secret cloudflare-dns-secret
             key: *name
-      - name: &name CLOUDFLARE_ZONE_ID
+      - name: &name CF_ZONE_ID
         valueFrom:
           secretKeyRef:
             name: *secret
@@ -29,7 +29,7 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --gateway-name=envoy-external
+      - --gateway-name=envoy
       - --zone-id-filter=$(CLOUDFLARE_ZONE_ID)
     triggerLoopOnEvent: true
     policy: sync
@@ -39,7 +39,7 @@ spec:
     txtOwnerId: default
     txtPrefix: k8s.%{record_type}-
     domainFilters:
-      - turbo.ac
+      - tebbenet.nl
     serviceMonitor:
       enabled: true
     podAnnotations:
