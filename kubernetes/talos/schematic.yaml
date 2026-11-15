@@ -1,15 +1,16 @@
 ---
 customization:
   extraKernelArgs:
-    - initcall_blacklist=algif_aead_init    # CVE-2026-31431, copy fail
-    - i915.enable_guc=2                     # Coffee Lake CPU & Intel iGPU
-    - intel_iommu=on                        # PCI Passthrough
-    - iommu=pt                              # PCI Passthrough
-    - sysctl.kernel.kexec_load_disabled=1   # Coffee Lake CPU & Intel iGPU
+    - initcall_blacklist=algif_aead_init # CVE-2026-31431, copy fail
+    - i915.enable_guc=2 # Coffee Lake CPU & Intel iGPU
+    - intel_iommu=on # PCI Passthrough
+    - iommu=pt # PCI Passthrough
+    - sysctl.kernel.kexec_load_disabled=1 # Coffee Lake CPU & Intel iGPU
   systemExtensions:
     officialExtensions:
-      - siderolabs/realtek-firmware         # Realtek NIC
-      - siderolabs/drbd                     # Miroir instead of Ceph
-      - siderolabs/i915                     # Intel iGPU
-      - siderolabs/intel-ucode              # Intel iGPU
-      - siderolabs/nfsrahead                # NFS Readahead
+      - siderolabs/realtek-firmware # Realtek NIC
+      - siderolabs/drbd # Miroir instead of Ceph
+      - siderolabs/i915 # Intel iGPU
+      - siderolabs/intel-ucode # Intel iGPU
+      - siderolabs/nfsrahead # NFS Readahead
+      - siderolabs/tailscale # Tailscale connectivity

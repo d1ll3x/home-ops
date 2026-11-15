@@ -11,9 +11,9 @@ machine:
 cluster:
   ca:
     crt: {{ ENV.CLUSTER_CA_CRT }}
-  clusterName: kotor
+  clusterName: odysseus
   controlPlane:
-    endpoint: https://k8s.internal:6443
+    endpoint: https://k8s.tebbenet.nl:6443
   token: {{ ENV.CLUSTER_TOKEN }}
 ---
 apiVersion: v1alpha1

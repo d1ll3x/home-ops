@@ -21,6 +21,7 @@ CLUSTER_ETCD_CA_CRT = { provider = "talos", value = "CLUSTER_ETCD_CA_CRT" }
 CLUSTER_ETCD_CA_KEY = { provider = "talos", value = "CLUSTER_ETCD_CA_KEY" }
 CLUSTER_SERVICEACCOUNT_KEY = { provider = "talos", value = "CLUSTER_SERVICEACCOUNT_KEY" }
 CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "talos", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
+CLUSTER_TS_AUTHKEY = { provider = "talos", value = "CLUSTER_TS_AUTHKEY" }
 
 # Secret zero, consumed by bootstrap/kustomize/external-secrets/secret.yaml
 ESO_ACCESS_TOKEN = { provider = "apps", value = "ESO_ACCESS_TOKEN" }
