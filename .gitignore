@@ -19,9 +19,3 @@ talosconfig
 *.tfvars.json
 crash.log
 *.tfplan
-
-# Agents
-.claude/
-.mcp.json
-CLAUDE.md
-AGENTS.md
