@@ -41,6 +41,11 @@ exclude = [".mise/locks/**"]
 run = "oxfmt --no-error-on-unmatched-pattern {staged_files}"
 stage_fixed = true
 
+[pre-commit.commands.format-terraform]
+glob = ["*.tf", "*.tfvars", "*.tftest.hcl"]
+run = "terraform fmt {staged_files}"
+stage_fixed = true
+
 [pre-commit.commands.zizmor]
 glob = [".github/workflows/*.yaml", ".github/actions/**/action.yaml"]
 run = "zizmor --offline {staged_files}"

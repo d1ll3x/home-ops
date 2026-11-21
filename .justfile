@@ -19,7 +19,7 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 
 # Talos Recipes
 [group('Talos')]
-mod talos "talos"
+mod talos "kubernetes/talos"
 
 [private]
 log lvl msg *args:

@@ -1,0 +1,75 @@
+// Tailnet policy file for odysseus, applied by terraform/ (module tailscale).
+// Grants only, deny by default: anything not granted below is dropped.
+// Terraform owns this file; edits in the admin console are overwritten on the next apply.
+// Syntax: https://tailscale.com/kb/1337/policy-syntax
+{
+  // Names for the subnet-routed /32s, so grants read as roles.
+  "hosts": {
+    "unifi": "192.168.20.1", // UniFi gateway: DNS resolver for split DNS, UniFi console
+    "nautilus": "192.168.20.200",
+    "calypso": "192.168.20.201",
+    "proteus": "192.168.20.202",
+    "kube-api": "192.168.21.69", // Cilium kube-api LoadBalancer
+    "envoy-internal": "192.168.21.100", // Envoy Gateway envoy-internal
+  },
+
+  "tagOwners": {
+    "tag:k8s": ["autogroup:admin"],
+  },
+
+  // Every odysseus node advertises the same /32s (HA subnet routers), so the
+  // routes are approved for the tag, not for one node.
+  "autoApprovers": {
+    "routes": {
+      "192.168.20.1/32": ["tag:k8s"],
+      "192.168.20.200/32": ["tag:k8s"],
+      "192.168.20.201/32": ["tag:k8s"],
+      "192.168.20.202/32": ["tag:k8s"],
+      "192.168.21.69/32": ["tag:k8s"],
+      "192.168.21.100/32": ["tag:k8s"],
+    },
+  },
+
+  "grants": [
+    // Everyone (autogroup:member): the apps and the DNS that finds them.
+
+    // Apps behind the envoy-internal Gateway (HTTPRoutes).
+    {
+      "src": ["autogroup:member"],
+      "dst": ["envoy-internal"],
+      "ip": ["tcp:80", "tcp:443"],
+    },
+    // Split DNS: tebbenet.nl queries go to the UniFi resolver; without this
+    // no member can resolve the app names above.
+    {
+      "src": ["autogroup:member"],
+      "dst": ["unifi"],
+      "ip": ["udp:53", "tcp:53"],
+    },
+
+    // Admins only (autogroup:admin): cluster and network management.
+
+    // kubectl against k8s.tebbenet.nl.
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["kube-api"],
+      "ip": ["tcp:6443"],
+    },
+    // talosctl against each node's Talos API.
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["nautilus", "calypso", "proteus"],
+      "ip": ["tcp:50000"],
+    },
+    // UniFi console.
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["unifi"],
+      "ip": ["tcp:443"],
+    },
+  ],
+
+  // No "tests" yet: a test src must be a concrete user, group, tag or host
+  // (autogroups are rejected), and no user login goes into this public repo.
+  // Deferred until there is a source to test from.
+}
