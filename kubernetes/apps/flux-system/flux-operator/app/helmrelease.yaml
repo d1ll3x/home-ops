@@ -23,9 +23,9 @@ spec:
       httpRoute:
         enabled: true
         hostnames:
-          - flux-operator.turbo.ac
+          - flux-operator.tebbenet.nl
         parentRefs:
           - name: envoy-internal
-            namespace: network
+            namespace: envoy-gateway-system
       networkPolicy:
         create: false
