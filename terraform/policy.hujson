@@ -1,4 +1,4 @@
-// Tailnet policy file for odysseus, applied by terraform/tailscale (ADR-0012).
+// Tailnet policy file for odysseus, applied by terraform/ (module tailscale).
 // Grants only, deny by default: anything not granted below is dropped.
 // Terraform owns this file; edits in the admin console are overwritten on the next apply.
 // Syntax: https://tailscale.com/kb/1337/policy-syntax
@@ -7,8 +7,8 @@
   "hosts": {
     "unifi": "192.168.20.1", // UniFi gateway: DNS resolver for split DNS
     "nautilus": "192.168.20.200",
-    "malgus": "192.168.20.201", // joins in M9
-    "bane": "192.168.20.202", // joins in M9
+    "calypso": "192.168.20.201",
+    "proteus": "192.168.20.202",
     "kube-api": "192.168.21.69", // Cilium kube-api LoadBalancer
     "envoy-internal": "192.168.21.100", // Envoy Gateway envoy-internal
   },
@@ -47,7 +47,7 @@
     // talosctl against each node's Talos API.
     {
       "src": ["autogroup:member"],
-      "dst": ["nautilus", "malgus", "bane"],
+      "dst": ["nautilus", "calypso", "proteus"],
       "ip": ["tcp:50000"],
     },
     // Split DNS: tebbenet.nl queries go to the UniFi resolver.
@@ -75,8 +75,8 @@
         "envoy-internal:443",
         "kube-api:6443",
         "nautilus:50000",
-        "malgus:50000",
-        "bane:50000",
+        "calypso:50000",
+        "proteus:50000",
         "unifi:53",
       ],
       "deny": [
