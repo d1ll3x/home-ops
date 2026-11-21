@@ -21,6 +21,10 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 [group('Talos')]
 mod talos "kubernetes/talos"
 
+# Terraform Recipes
+[group('Terraform')]
+mod terraform "terraform"
+
 [private]
 log lvl msg *args:
     gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}

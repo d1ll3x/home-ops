@@ -11,6 +11,15 @@ secrets.yaml
 kubeconfig
 talosconfig
 
+# Terraform (.terraform.lock.hcl is committed)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+*.tfplan
+
 # Agents
 .claude/
 .mcp.json

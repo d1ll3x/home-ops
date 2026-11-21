@@ -1,0 +1,97 @@
+// Tailnet policy file for odysseus, applied by terraform/tailscale (ADR-0012).
+// Grants only, deny by default: anything not granted below is dropped.
+// Terraform owns this file; edits in the admin console are overwritten on the next apply.
+// Syntax: https://tailscale.com/kb/1337/policy-syntax
+{
+  // Names for the subnet-routed /32s, so grants and tests read as roles.
+  "hosts": {
+    "unifi": "192.168.20.1", // UniFi gateway: DNS resolver for split DNS
+    "nautilus": "192.168.20.200",
+    "malgus": "192.168.20.201", // joins in M9
+    "bane": "192.168.20.202", // joins in M9
+    "kube-api": "192.168.21.69", // Cilium kube-api LoadBalancer
+    "envoy-internal": "192.168.21.100", // Envoy Gateway envoy-internal
+  },
+
+  "tagOwners": {
+    "tag:k8s": ["autogroup:admin"],
+    "tag:odysseus": ["autogroup:admin"],
+  },
+
+  // Every odysseus node advertises the same /32s (HA subnet routers), so the
+  // routes are approved for the tag, not for one node.
+  "autoApprovers": {
+    "routes": {
+      "192.168.20.1/32": ["tag:odysseus"],
+      "192.168.20.200/32": ["tag:odysseus"],
+      "192.168.20.201/32": ["tag:odysseus"],
+      "192.168.20.202/32": ["tag:odysseus"],
+      "192.168.21.69/32": ["tag:odysseus"],
+      "192.168.21.100/32": ["tag:odysseus"],
+    },
+  },
+
+  "grants": [
+    // Apps behind the envoy-internal Gateway (HTTPRoutes).
+    {
+      "src": ["autogroup:member"],
+      "dst": ["envoy-internal"],
+      "ip": ["tcp:80", "tcp:443"],
+    },
+    // kubectl against k8s.tebbenet.nl.
+    {
+      "src": ["autogroup:member"],
+      "dst": ["kube-api"],
+      "ip": ["tcp:6443"],
+    },
+    // talosctl against each node's Talos API.
+    {
+      "src": ["autogroup:member"],
+      "dst": ["nautilus", "malgus", "bane"],
+      "ip": ["tcp:50000"],
+    },
+    // Split DNS: tebbenet.nl queries go to the UniFi resolver.
+    {
+      "src": ["autogroup:member"],
+      "dst": ["unifi"],
+      "ip": ["udp:53", "tcp:53"],
+    },
+    // A member's own devices reach each other (laptop <-> phone, Taildrop).
+    {
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "ip": ["*"],
+    },
+  ],
+
+  // Checked by Tailscale on every policy change (and by terraform plan): a
+  // failing test rejects the whole policy.
+  "tests": [
+    {
+      "src": "autogroup:member",
+      "proto": "tcp",
+      "accept": [
+        "envoy-internal:80",
+        "envoy-internal:443",
+        "kube-api:6443",
+        "nautilus:50000",
+        "malgus:50000",
+        "bane:50000",
+        "unifi:53",
+      ],
+      "deny": [
+        "envoy-internal:22",
+        "kube-api:22",
+        "nautilus:22",
+        "nautilus:6443",
+        "unifi:443",
+      ],
+    },
+    {
+      "src": "autogroup:member",
+      "proto": "udp",
+      "accept": ["unifi:53"],
+      "deny": ["envoy-internal:53"],
+    },
+  ],
+}
