@@ -5,8 +5,37 @@ kind: Kustomization
 metadata:
   name: unifi
 spec:
+  # The HelmRelease installs dnsendpoints.externaldns.k8s.io from the chart's crds/.
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: unifi-dns
+      namespace: external-dns
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: dnsendpoints.externaldns.k8s.io
   interval: 1h
   path: ./kubernetes/apps/external-dns/unifi/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: external-dns
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: unifi-endpoints
+spec:
+  # A DNSEndpoint can't share a Kustomization with the HelmRelease that installs its
+  # CRD: Flux dry-runs every object first, and on a fresh cluster the kind is unknown,
+  # so nothing would apply. onedr0p gets the same gate from dependsOn: cloudflare-dns.
+  dependsOn:
+    - name: unifi
+  interval: 1h
+  path: ./kubernetes/apps/external-dns/unifi/endpoints
   prune: true
   sourceRef:
     kind: GitRepository

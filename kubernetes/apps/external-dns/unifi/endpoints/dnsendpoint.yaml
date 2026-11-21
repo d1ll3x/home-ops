@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+# Records with no Kubernetes object behind them. The API endpoint (k8s.tebbenet.nl)
+# is not listed here: the service source publishes it from the kube-api Service.
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: nodes
+spec:
+  endpoints:
+    # Node IPs for talosctl (port 50000 is never behind kube-api).
+    - dnsName: nautilus.tebbenet.nl
+      recordTTL: 300
+      recordType: A
+      targets:
+        - 192.168.20.200

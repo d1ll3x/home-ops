@@ -7,5 +7,4 @@ components:
   - ../../components/alerts
   - ../../components/namespace
 resources:
-  - ./cloudflare/ks.yaml
   - ./unifi/ks.yaml
