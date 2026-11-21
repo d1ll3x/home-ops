@@ -25,3 +25,8 @@ releases:
 
   - name: snapshot-controller
     namespace: kube-system
+
+  # dnsendpoints.externaldns.k8s.io: unifi/app ships a DNSEndpoint next to the
+  # HelmRelease that would otherwise install it.
+  - name: unifi
+    namespace: external-dns

@@ -31,6 +31,9 @@ spec:
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
+    extraArgs:
+      # Only HTTPRoutes attached to envoy-internal; the service and crd sources are unaffected.
+      - --gateway-name=envoy-internal
     triggerLoopOnEvent: true
     policy: sync
     sources:
