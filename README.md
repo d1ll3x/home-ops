@@ -2,7 +2,7 @@
 
 My homelab running on Kubernetes: [Talos Linux](https://www.talos.dev/) nodes, [Cilium](https://cilium.io/) networking and [Flux](https://fluxcd.io/) GitOps. I build it by hand to learn how to operate Kubernetes, so every change comes with the reasoning behind it.
 
-## Current state
+## 🚧 Current state
 
 The proof of concept runs on a single node, **nautilus**: a control plane that also runs workloads. Two more nodes, **calypso** and **proteus**, will join later. Nothing is live yet. The cluster config is being built milestone by milestone, and the Talos layer (M1) is close to done.
 
@@ -19,17 +19,17 @@ The proof of concept runs on a single node, **nautilus**: a control plane that a
 
 Work is tracked in [GitHub issues and milestones](https://github.com/d1ll3x/home-ops/milestones), M1 to M9: Talos → bootstrap → BGP → basics → secrets & certs → gateway & DNS → rebuild drill → storage → three nodes.
 
-## Roadmap
+## ✨ Roadmap
 
-- **Finish M2–M9**: bootstrap the node, BGP peering, certificates, gateway and DNS, a full rebuild drill, storage, and finally the three-node cluster.
-- **Renovate**: automatic update PRs for Helm charts, container images, Talos/Kubernetes versions, mise tools and Terraform providers.
-- **GitHub Actions**:
+- 🏗️ **Finish M2–M9**: bootstrap the node, BGP peering, certificates, gateway and DNS, a full rebuild drill, storage, and finally the three-node cluster.
+- ⬆️ **Renovate**: automatic update PRs for Helm charts, container images, Talos/Kubernetes versions, mise tools and Terraform providers.
+- 👷 **GitHub Actions**:
   - validate every PR: Flux/kustomize builds, schema checks, lint and formatting;
   - run `terraform plan` on PRs and `apply` on merge for the tailnet, so it no longer runs from my workstation;
   - validate the Renovate config.
-- **Observability**: kube-prometheus-stack and grafana-operator. Their CRDs are already part of the bootstrap.
+- 📈 **Observability**: kube-prometheus-stack and grafana-operator. Their CRDs are already part of the bootstrap.
 
-## Thanks
+## 👥 Thanks
 
 This repo stands on the shoulders of these, and I check how they solve a problem before designing my own approach:
 
