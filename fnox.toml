@@ -23,5 +23,13 @@ CLUSTER_SERVICEACCOUNT_KEY = { provider = "talos", value = "CLUSTER_SERVICEACCOU
 CLUSTER_SECRETBOXENCRYPTIONSECRET = { provider = "talos", value = "CLUSTER_SECRETBOXENCRYPTIONSECRET" }
 CLUSTER_TS_AUTHKEY = { provider = "talos", value = "CLUSTER_TS_AUTHKEY" }
 
-# Secret zero, consumed by bootstrap/kustomize/external-secrets/secret.yaml
-ESO_ACCESS_TOKEN = { provider = "apps", value = "ESO_ACCESS_TOKEN" }
+# External Sectrets Operator
+ESO_ACCESS_TOKEN = { provider = "bws", value = "ESO_ACCESS_TOKEN" }
+
+# Scaleway Keys
+AWS_SECRET_ACCESS_KEY = { provider = "bws", value = "SCW_SECRET_KEY" }
+AWS_ACCESS_KEY_ID = { provider = "bws", value = "SCW_ACCESS_KEY" }
+
+# Tailscale
+TAILSCALE_OAUTH_CLIENT_ID = { provider = "bws", value = "TS_OAUTH_CLIENT_ID" }
+TAILSCALE_OAUTH_CLIENT_SECRET = { provider = "bws", value = "TS_OAUTH_CLIENT_SECRET" }
