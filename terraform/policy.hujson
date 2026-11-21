@@ -3,9 +3,9 @@
 // Terraform owns this file; edits in the admin console are overwritten on the next apply.
 // Syntax: https://tailscale.com/kb/1337/policy-syntax
 {
-  // Names for the subnet-routed /32s, so grants and tests read as roles.
+  // Names for the subnet-routed /32s, so grants read as roles.
   "hosts": {
-    "unifi": "192.168.20.1", // UniFi gateway: DNS resolver for split DNS
+    "unifi": "192.168.20.1", // UniFi gateway: DNS resolver for split DNS, UniFi console
     "nautilus": "192.168.20.200",
     "calypso": "192.168.20.201",
     "proteus": "192.168.20.202",
@@ -15,83 +15,61 @@
 
   "tagOwners": {
     "tag:k8s": ["autogroup:admin"],
-    "tag:odysseus": ["autogroup:admin"],
   },
 
   // Every odysseus node advertises the same /32s (HA subnet routers), so the
   // routes are approved for the tag, not for one node.
   "autoApprovers": {
     "routes": {
-      "192.168.20.1/32": ["tag:odysseus"],
-      "192.168.20.200/32": ["tag:odysseus"],
-      "192.168.20.201/32": ["tag:odysseus"],
-      "192.168.20.202/32": ["tag:odysseus"],
-      "192.168.21.69/32": ["tag:odysseus"],
-      "192.168.21.100/32": ["tag:odysseus"],
+      "192.168.20.1/32": ["tag:k8s"],
+      "192.168.20.200/32": ["tag:k8s"],
+      "192.168.20.201/32": ["tag:k8s"],
+      "192.168.20.202/32": ["tag:k8s"],
+      "192.168.21.69/32": ["tag:k8s"],
+      "192.168.21.100/32": ["tag:k8s"],
     },
   },
 
   "grants": [
+    // Everyone (autogroup:member): the apps and the DNS that finds them.
+
     // Apps behind the envoy-internal Gateway (HTTPRoutes).
     {
       "src": ["autogroup:member"],
       "dst": ["envoy-internal"],
       "ip": ["tcp:80", "tcp:443"],
     },
-    // kubectl against k8s.tebbenet.nl.
-    {
-      "src": ["autogroup:member"],
-      "dst": ["kube-api"],
-      "ip": ["tcp:6443"],
-    },
-    // talosctl against each node's Talos API.
-    {
-      "src": ["autogroup:member"],
-      "dst": ["nautilus", "calypso", "proteus"],
-      "ip": ["tcp:50000"],
-    },
-    // Split DNS: tebbenet.nl queries go to the UniFi resolver.
+    // Split DNS: tebbenet.nl queries go to the UniFi resolver; without this
+    // no member can resolve the app names above.
     {
       "src": ["autogroup:member"],
       "dst": ["unifi"],
       "ip": ["udp:53", "tcp:53"],
     },
-    // A member's own devices reach each other (laptop <-> phone, Taildrop).
+
+    // Admins only (autogroup:admin): cluster and network management.
+
+    // kubectl against k8s.tebbenet.nl.
     {
-      "src": ["autogroup:member"],
-      "dst": ["autogroup:self"],
-      "ip": ["*"],
+      "src": ["autogroup:admin"],
+      "dst": ["kube-api"],
+      "ip": ["tcp:6443"],
+    },
+    // talosctl against each node's Talos API.
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["nautilus", "calypso", "proteus"],
+      "ip": ["tcp:50000"],
+    },
+    // UniFi console.
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["unifi"],
+      "ip": ["tcp:443"],
     },
   ],
 
-  // Checked by Tailscale on every policy change (and by terraform plan): a
-  // failing test rejects the whole policy.
-  "tests": [
-    {
-      "src": "autogroup:member",
-      "proto": "tcp",
-      "accept": [
-        "envoy-internal:80",
-        "envoy-internal:443",
-        "kube-api:6443",
-        "nautilus:50000",
-        "calypso:50000",
-        "proteus:50000",
-        "unifi:53",
-      ],
-      "deny": [
-        "envoy-internal:22",
-        "kube-api:22",
-        "nautilus:22",
-        "nautilus:6443",
-        "unifi:443",
-      ],
-    },
-    {
-      "src": "autogroup:member",
-      "proto": "udp",
-      "accept": ["unifi:53"],
-      "deny": ["envoy-internal:53"],
-    },
-  ],
+  // No "tests" yet: a test src must be a concrete user, group, tag or host
+  // (autogroups are rejected), and no user login goes into this public repo.
+  // Deferred until there is a source to test from.
 }
