@@ -1,6 +1,6 @@
 [providers]
-keychain = { type = "keychain", service = "fnox", prefix = "bws/" }
-bws = { type = "bitwarden-sm", project_id = "583cc0c9-2762-4769-9a35-b4da00ebcc1b" }
+keychain = { type = "keychain", service = "fnox", prefix = "talos/" }
+bws = { type = "bitwarden-sm", project_id = "582cc0c9-2762-4769-9a35-b4da00ebcc1b" }
 
 [secrets]
 # Bitwarden Secrets Manager
