@@ -128,3 +128,4 @@ releases:
     namespace: flux-system
     needs:
       - flux-system/flux-operator
+
