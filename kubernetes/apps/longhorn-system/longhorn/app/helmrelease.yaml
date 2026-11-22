@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+spec:
+  chart:
+    spec:
+      chart: longhorn
+      version: 1.13.0
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+  interval: 1h
+  values:
+    defaultBackupStore:
+      # TODO(#23): replace REPLACE-ME-longhorn-bucket with the Scaleway bucket name.
+      # Encryption is the bucket's default (Scaleway-managed keys); Longhorn sends no SSE headers.
+      backupTarget: s3://REPLACE-ME-longhorn-bucket@nl-ams/
+      backupTargetCredentialSecret: longhorn-backup-secret
+    defaultSettings:
+      defaultDataPath: /var/mnt/longhorn # the Talos UserVolumeConfig "longhorn"
+      defaultReplicaCount: 1 # one node until M10 (#26)
+      storageReservedPercentageForDefaultDisk: 10 # the disk is dedicated to Longhorn
+    longhornGlobalManager:
+      replicas: 1 # standbys only help with more than one node
+    longhornUI:
+      replicas: 1
+    metrics:
+      serviceMonitor:
+        enabled: true
+    persistence:
+      # The chart-managed "longhorn" class: the manager reconciles it from a
+      # ConfigMap, so raising the replica count in M10 is a values change.
+      defaultClass: true
+      defaultClassReplicaCount: 1
+      defaultDataLocality: best-effort

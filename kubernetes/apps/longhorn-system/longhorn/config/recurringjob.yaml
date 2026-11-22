@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
+# Opt-in backups: only volumes labelled recurring-job-group.longhorn.io/backup
+# (components/longhorn/backup) join. Not the "default" group, which Longhorn
+# applies to every unlabelled volume and would back up Prometheus too.
+# The snapshot each backup takes is removed afterwards
+# (setting auto-cleanup-recurring-job-backup-snapshot, default true).
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-daily
+spec:
+  concurrency: 1
+  cron: "0 3 * * *" # UTC, the manager's timezone
+  groups:
+    - backup
+  name: backup-daily
+  retain: 14
+  task: backup
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
+# Talos's FilesystemTrimConfig trims host filesystems only, not the ext4 inside
+# Longhorn volumes; this returns freed blocks to the Longhorn disk.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: trim-weekly
+spec:
+  concurrency: 1
+  cron: "0 4 * * 0" # UTC, Sundays
+  groups:
+    - default
+    - backup
+  name: trim-weekly
+  retain: 0
+  task: filesystem-trim

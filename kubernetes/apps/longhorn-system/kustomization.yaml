@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: longhorn-system
+
+components:
+  - ../../components/alerts
+  - ../../components/namespace
+
+resources:
+  - ./longhorn/ks.yaml
+
+patches:
+  # Longhorn's manager, instance-manager and CSI pods are privileged (host /
+  # mount, iSCSI, block devices). Talos enforces the baseline Pod Security
+  # standard on every namespace, so without these labels the pods are rejected.
+  - target:
+      kind: Namespace
+    patch: |-
+      - op: add
+        path: /metadata/labels
+        value:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged

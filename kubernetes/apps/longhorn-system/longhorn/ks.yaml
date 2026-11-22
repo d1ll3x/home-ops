@@ -3,35 +3,43 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kopiur
+  name: longhorn
 spec:
+  dependsOn:
+    # Longhorn's csi-snapshotter sidecar needs the VolumeSnapshot CRDs
+    - name: snapshot-controller
+      namespace: kube-system
+  # Only the HelmRelease gates readiness. `wait: true` would also wait on the
+  # backup ExternalSecret, so a missing BWS secret would block every StorageClass.
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: kopiur
-      namespace: kopiur-system
+      name: longhorn
+      namespace: longhorn-system
   interval: 1h
-  path: ./kubernetes/apps/kopiur-system/kopiur/app
+  path: ./kubernetes/apps/longhorn-system/longhorn/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: kopiur-system
+  targetNamespace: longhorn-system
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kopiur-repository
+  name: longhorn-config
 spec:
   dependsOn:
-    - name: kopiur
+    # RecurringJob is a Longhorn CRD, installed by the chart
+    - name: longhorn
   interval: 1h
-  path: ./kubernetes/apps/kopiur-system/kopiur/repository
+  path: ./kubernetes/apps/longhorn-system/longhorn/config
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: kopiur-system
+  targetNamespace: longhorn-system
+  wait: true
