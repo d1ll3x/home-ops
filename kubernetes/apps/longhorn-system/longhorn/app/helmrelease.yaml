@@ -16,7 +16,7 @@ spec:
   values:
     defaultBackupStore:
       # Encryption is the bucket's default (Scaleway-managed keys); Longhorn sends no SSE headers.
-      backupTarget: s3://home-ops.longhorn@nl-ams/
+      backupTarget: s3://longhorn@nl-ams/
       backupTargetCredentialSecret: longhorn-backup-secret
     defaultSettings:
       defaultDataPath: /var/mnt/longhorn # the Talos UserVolumeConfig "longhorn"
