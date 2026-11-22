@@ -1,0 +1,55 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gatus-sidecar
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: gatus-sidecar
+  interval: 1h
+  values:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: "true"
+    gatus:
+      delayStartSeconds: "5"
+      env:
+        TZ: Europe/Amsterdam
+      envFrom:
+        - secretRef:
+            name: "{{ .Release.Name }}-secret"
+    # Plain Gatus for the Watchdog heartbeat; the sidecar comes in #44
+    sidecar:
+      enabled: false
+    rbac:
+      create: false
+    serviceAccount:
+      automount: false
+    httpRoute:
+      enabled: true
+      annotations:
+        # Keep the sidecar (#44) from generating a check for Gatus's own route
+        gatus.home-operations.com/enabled: "false"
+      hostnames:
+        - status.tebbenet.nl
+      parentRefs:
+        # Internal only: never envoy-external
+        - name: envoy-internal
+          namespace: envoy-gateway-system
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    config:
+      existingConfigMap: "{{ .Release.Name }}-configmap"
+      items:
+        - key: config.yaml
+          path: config.yaml
+    # No PVC: results live in memory; the heartbeat recovers on the next push
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 256Mi

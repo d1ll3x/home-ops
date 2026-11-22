@@ -1,0 +1,59 @@
+---
+# Dead man's switch: no Watchdog push for two 5m intervals pages Pushover directly
+alerting:
+  pushover:
+    application-token: ${GATUS_PUSHOVER_TOKEN}
+    user-key: ${GATUS_PUSHOVER_USER_KEY}
+    title: Gatus
+    priority: 1
+    resolved-priority: 0
+    default-alert:
+      failure-threshold: 3
+      success-threshold: 2
+      minimum-reminder-interval: 1h
+      send-on-resolved: true
+
+# Gatus needs a regular endpoint; these also show which half broke
+endpoints:
+  - name: prometheus
+    group: observability
+    url: http://prometheus-operated.observability.svc.cluster.local:9090/-/healthy
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: pushover
+        description: Prometheus /-/healthy failing
+
+  - name: alertmanager
+    group: observability
+    url: http://alertmanager-operated.observability.svc.cluster.local:9093/-/healthy
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: pushover
+        description: Alertmanager /-/healthy failing
+
+external-endpoints:
+  - name: alertmanager
+    group: heartbeat
+    token: ${GATUS_HEARTBEAT_TOKEN}
+    heartbeat:
+      interval: 5m
+    alerts:
+      - type: pushover
+        description: Watchdog heartbeat missed (Prometheus or Alertmanager down?)
+        failure-threshold: 2
+
+metrics: true
+
+storage:
+  type: memory
+
+ui:
+  title: Status | Gatus
+  header: odysseus
+
+web:
+  port: ${GATUS_WEB_PORT}
