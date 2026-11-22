@@ -1,0 +1,61 @@
+---
+# Dead man's switch: Alertmanager's always-firing Watchdog alert is pushed to
+# this external endpoint (key heartbeat_alertmanager). When pushes stop for
+# longer than the heartbeat interval, Gatus records failures and, after
+# failure-threshold of them, notifies Pushover directly: no Alertmanager involved.
+alerting:
+  pushover:
+    application-token: ${GATUS_PUSHOVER_TOKEN}
+    user-key: ${GATUS_PUSHOVER_USER_KEY}
+    title: Gatus
+    priority: 1
+    resolved-priority: 0
+    default-alert:
+      description: heartbeat missed
+      failure-threshold: 3
+      success-threshold: 2
+      minimum-reminder-interval: 1h
+      send-on-resolved: true
+
+# Gatus needs at least one regular endpoint. These two also say which half
+# broke when the heartbeat stops. They use the operators' governing Services,
+# which exist for any Prometheus/Alertmanager CR.
+endpoints:
+  - name: prometheus
+    group: observability
+    url: http://prometheus-operated.observability.svc.cluster.local:9090/-/healthy
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: pushover
+
+  - name: alertmanager
+    group: observability
+    url: http://alertmanager-operated.observability.svc.cluster.local:9093/-/healthy
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: pushover
+
+external-endpoints:
+  - name: alertmanager
+    group: heartbeat
+    token: ${GATUS_HEARTBEAT_TOKEN}
+    heartbeat:
+      interval: 5m
+    alerts:
+      - type: pushover
+
+metrics: true
+
+storage:
+  type: memory
+
+ui:
+  title: Status | Gatus
+  header: odysseus
+
+web:
+  port: ${GATUS_WEB_PORT}

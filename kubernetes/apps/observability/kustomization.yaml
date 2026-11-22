@@ -9,5 +9,6 @@ components:
   - ../../components/namespace
 
 resources:
+  - ./gatus-sidecar/ks.yaml
   - ./grafana-operator/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
