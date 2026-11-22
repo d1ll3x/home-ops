@@ -1,8 +1,5 @@
 ---
-# Dead man's switch: Alertmanager's always-firing Watchdog alert is pushed to
-# this external endpoint (key heartbeat_alertmanager), about every 4 min. Each
-# 5m heartbeat interval without a push is a failure; after two (~10-20 min after
-# the last push) Gatus notifies Pushover directly: no Alertmanager involved.
+# Dead man's switch: no Watchdog push for two 5m intervals pages Pushover directly
 alerting:
   pushover:
     application-token: ${GATUS_PUSHOVER_TOKEN}
@@ -16,9 +13,7 @@ alerting:
       minimum-reminder-interval: 1h
       send-on-resolved: true
 
-# Gatus needs at least one regular endpoint. These two also say which half
-# broke when the heartbeat stops. They use the operators' governing Services,
-# which exist for any Prometheus/Alertmanager CR.
+# Gatus needs a regular endpoint; these also show which half broke
 endpoints:
   - name: prometheus
     group: observability

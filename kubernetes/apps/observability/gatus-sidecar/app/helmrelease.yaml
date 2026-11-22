@@ -19,8 +19,7 @@ spec:
       envFrom:
         - secretRef:
             name: "{{ .Release.Name }}-secret"
-    # For now this is plain Gatus: the heartbeat receiver for Alertmanager's
-    # Watchdog. The sidecar (HTTPRoute discovery) and its API access come in #44.
+    # Plain Gatus for the Watchdog heartbeat; the sidecar comes in #44
     sidecar:
       enabled: false
     rbac:
@@ -46,8 +45,7 @@ spec:
       items:
         - key: config.yaml
           path: config.yaml
-    # No PVC: results live in memory. After a restart the heartbeat simply
-    # waits for the next Watchdog push.
+    # No PVC: results live in memory; the heartbeat recovers on the next push
     persistence:
       enabled: false
     resources:
