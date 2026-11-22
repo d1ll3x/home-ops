@@ -1,6 +1,6 @@
 [env]
 KUBECONFIG = "{{config_root}}/kubeconfig"
-TALOSCONFIG = "{{config_root}}/talos/talosconfig"
+TALOSCONFIG = "{{config_root}}/talosconfig"
 MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
 
 [hooks]
