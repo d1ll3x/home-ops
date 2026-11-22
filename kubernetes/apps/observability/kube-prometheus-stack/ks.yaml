@@ -5,6 +5,10 @@ kind: Kustomization
 metadata:
   name: kube-prometheus-stack
 spec:
+  dependsOn:
+    # PVCs on longhorn-local, a StorageClass created by longhorn-config
+    - name: longhorn-config
+      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/observability/kube-prometheus-stack/app
   prune: true

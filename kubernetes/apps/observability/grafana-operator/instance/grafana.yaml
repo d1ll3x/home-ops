@@ -72,5 +72,5 @@ spec:
       resources:
         requests:
           storage: 5Gi
-      storageClassName: miroir-slow-local
+      storageClassName: longhorn-local
   disableDefaultSecurityContext: All

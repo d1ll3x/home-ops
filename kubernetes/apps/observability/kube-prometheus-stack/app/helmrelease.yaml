@@ -31,7 +31,7 @@ spec:
         storage:
           volumeClaimTemplate:
             spec:
-              storageClassName: miroir-slow-local
+              storageClassName: longhorn-local
               resources:
                 requests:
                   storage: 1Gi
@@ -67,7 +67,7 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: miroir-slow-local
+              storageClassName: longhorn-local
               resources:
                 requests:
                   storage: 50Gi

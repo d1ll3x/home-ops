@@ -23,6 +23,9 @@ metadata:
 spec:
   dependsOn:
     - name: grafana-operator
+    # The Grafana PVC is on longhorn-local, created by longhorn-config
+    - name: longhorn-config
+      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/observability/grafana-operator/instance
   prune: true
