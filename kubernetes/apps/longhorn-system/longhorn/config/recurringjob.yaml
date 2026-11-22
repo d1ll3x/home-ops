@@ -11,7 +11,11 @@ metadata:
   name: backup-daily
 spec:
   concurrency: 1
-  cron: "0 3 * * *" # UTC, the manager's timezone
+  # UTC: Longhorn creates a CronJob without timeZone, so it runs on the
+  # kube-controller-manager's clock (UTC on Talos), and CRON_TZ is rejected.
+  # 02:00 UTC is 03:00 Europe/Amsterdam in winter (CET), 04:00 in summer
+  # (CEST). A fixed UTC time was chosen over setting TZ on the controller-manager.
+  cron: "0 2 * * *"
   groups:
     - backup
   name: backup-daily
@@ -27,7 +31,7 @@ metadata:
   name: trim-weekly
 spec:
   concurrency: 1
-  cron: "0 4 * * 0" # UTC, Sundays
+  cron: "0 4 * * 0" # UTC, Sundays (after the 02:00 UTC backup)
   groups:
     - default
     - backup

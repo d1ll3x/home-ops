@@ -27,8 +27,12 @@ spec:
       backupTarget: s3://longhorn@nl-ams/
       backupTargetCredentialSecret: longhorn-backup-secret
     defaultSettings:
+      # Recurring backups attach a detached volume (e.g. a scaled-to-zero app)
+      # to back it up. A pod starting meanwhile may wait for the backup, or
+      # interrupt it; an interrupted backup is retried the next night.
+      allowRecurringJobWhileVolumeDetached: true
       defaultDataPath: /var/mnt/longhorn # the Talos UserVolumeConfig "longhorn"
-      defaultReplicaCount: 1 # one node until M10 (#26)
+      defaultReplicaCount: 1 # one node until M10 (#26); 3 would leave every volume degraded
       storageReservedPercentageForDefaultDisk: 10 # the disk is dedicated to Longhorn
     longhornGlobalManager:
       replicas: 1 # standbys only help with more than one node
