@@ -29,6 +29,9 @@ spec:
       automount: false
     httpRoute:
       enabled: true
+      annotations:
+        # Keep the sidecar (#44) from generating a check for Gatus's own route
+        gatus.home-operations.com/enabled: "false"
       hostnames:
         - status.tebbenet.nl
       parentRefs:

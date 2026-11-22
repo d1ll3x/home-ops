@@ -1,8 +1,8 @@
 ---
 # Dead man's switch: Alertmanager's always-firing Watchdog alert is pushed to
-# this external endpoint (key heartbeat_alertmanager). When pushes stop for
-# longer than the heartbeat interval, Gatus records failures and, after
-# failure-threshold of them, notifies Pushover directly: no Alertmanager involved.
+# this external endpoint (key heartbeat_alertmanager), about every 4 min. Each
+# 5m heartbeat interval without a push is a failure; after two (~10-20 min after
+# the last push) Gatus notifies Pushover directly: no Alertmanager involved.
 alerting:
   pushover:
     application-token: ${GATUS_PUSHOVER_TOKEN}
@@ -11,7 +11,6 @@ alerting:
     priority: 1
     resolved-priority: 0
     default-alert:
-      description: heartbeat missed
       failure-threshold: 3
       success-threshold: 2
       minimum-reminder-interval: 1h
@@ -29,6 +28,7 @@ endpoints:
       - "[STATUS] == 200"
     alerts:
       - type: pushover
+        description: Prometheus /-/healthy failing
 
   - name: alertmanager
     group: observability
@@ -38,6 +38,7 @@ endpoints:
       - "[STATUS] == 200"
     alerts:
       - type: pushover
+        description: Alertmanager /-/healthy failing
 
 external-endpoints:
   - name: alertmanager
@@ -47,6 +48,8 @@ external-endpoints:
       interval: 5m
     alerts:
       - type: pushover
+        description: Watchdog heartbeat missed (Prometheus or Alertmanager down?)
+        failure-threshold: 2
 
 metrics: true
 
