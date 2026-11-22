@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
+# Opt-in: only volumes in the "backup" group (components/longhorn/backup) are backed up
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-daily
+spec:
+  concurrency: 1
+  # UTC (no timeZone on Longhorn's CronJob): 03:00 CET, 04:00 CEST
+  cron: "0 2 * * *"
+  groups:
+    - backup
+  name: backup-daily
+  retain: 14
+  task: backup
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
+# Talos trims host filesystems only; this trims the filesystems inside Longhorn volumes
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: trim-weekly
+spec:
+  concurrency: 1
+  cron: "0 4 * * 0" # UTC, Sundays (after the 02:00 UTC backup)
+  groups:
+    - default
+    - backup
+  name: trim-weekly
+  retain: 0
+  task: filesystem-trim

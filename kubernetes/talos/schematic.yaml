@@ -9,8 +9,9 @@ customization:
   systemExtensions:
     officialExtensions:
       - siderolabs/realtek-firmware # Realtek NIC
-      - siderolabs/drbd # Miroir instead of Ceph
       - siderolabs/i915 # Intel iGPU
       - siderolabs/intel-ucode # Intel iGPU
+      - siderolabs/iscsi-tools # Longhorn V1: iscsid + iscsiadm attach volumes
       - siderolabs/nfsrahead # NFS Readahead
       - siderolabs/tailscale # Tailscale connectivity
+      - siderolabs/util-linux-tools # Longhorn: fstrim for volume trim

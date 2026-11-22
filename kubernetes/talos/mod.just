@@ -30,10 +30,11 @@ render-config node:
         -p @<(just template "{{ source_directory() }}/${role}.yaml.j2") \
         -p @<(just template "{{ source_directory() }}/nodes/${role}/{{ node }}.yaml.j2")
 
-[confirm('Reset node ' + node + ' [y|N] ?')]
-[doc('Reset a node')]
+# Destroys every Longhorn replica on the node: back up to Scaleway first
+[confirm('Reset node ' + node + ' (destroys its Longhorn data) [y|N] ?')]
+[doc('Reset a node, wiping its Longhorn disk')]
 reset-node node *args:
-    talosctl -n "{{ node }}" reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --system-labels-to-wipe u-local-hostpath --graceful=false {{ args }}
+    talosctl -n "{{ node }}" reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --system-labels-to-wipe u-longhorn --graceful=false {{ args }}
 
 [confirm('Shutdown node ' + node + ' [y|N] ?')]
 [doc('Shutdown a node')]

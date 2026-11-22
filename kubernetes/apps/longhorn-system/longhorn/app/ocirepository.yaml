@@ -1,14 +1,15 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.toolkit.fluxcd.io/ocirepository_v1.json
+# Mirror of the upstream chart until Longhorn publishes an OCI chart (longhorn/longhorn#9450)
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: kopiur
+  name: longhorn
 spec:
   interval: 15m
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 0.10.18
-  url: oci://ghcr.io/home-operations/charts/kopiur
+    tag: 1.13.0
+  url: oci://ghcr.io/home-operations/charts-mirror/longhorn

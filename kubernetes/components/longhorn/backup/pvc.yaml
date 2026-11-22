@@ -1,0 +1,16 @@
+---
+# PVC ${APP} in the daily "backup" group; needs APP and dependsOn longhorn-config
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${APP}
+  labels:
+    recurring-job-source.longhorn.io: enabled
+    recurring-job-group.longhorn.io/backup: enabled
+spec:
+  accessModes:
+    - ${LONGHORN_ACCESSMODES:=ReadWriteOnce}
+  resources:
+    requests:
+      storage: ${LONGHORN_CAPACITY:=5Gi}
+  storageClassName: ${LONGHORN_STORAGECLASS:=longhorn}

@@ -1,0 +1,101 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+# From https://longhorn.io/docs/1.13.0/monitoring/alert-rules-example/, fixed for the v1.11+ state label
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: longhorn-rules
+spec:
+  groups:
+    - name: longhorn.rules
+      rules:
+        - alert: LonghornVolumeStatusCritical
+          expr: longhorn_volume_robustness{state="faulted"} == 1
+          for: 5m
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is faulted
+          labels:
+            severity: critical
+
+        - alert: LonghornVolumeStatusWarning
+          expr: longhorn_volume_robustness{state="degraded"} == 1
+          for: 5m
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is degraded
+          labels:
+            severity: warning
+
+        - alert: LonghornVolumeFileSystemReadOnly
+          expr: longhorn_volume_file_system_read_only == 1
+          for: 5m
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) is mounted read-only
+          labels:
+            severity: critical
+
+        - alert: LonghornVolumeActualSpaceUsedWarning
+          expr: (longhorn_volume_actual_size_bytes / longhorn_volume_capacity_bytes) * 100 > 90
+          for: 5m
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} on {{ $labels.node }} uses {{ $value | humanize }}% of its capacity
+          labels:
+            severity: warning
+
+        - alert: LonghornBackupFailed
+          # 4 = Error; clears when failedBackupTTL (24h) deletes the failed backup
+          expr: longhorn_backup_state == 4
+          for: 5m
+          annotations:
+            summary: Longhorn backup {{ $labels.backup }} of volume {{ $labels.volume }} failed
+          labels:
+            severity: critical
+
+        - alert: LonghornVolumeBackupStale
+          # Daily backups plus 2h slack; 0 (never backed up) is excluded
+          expr: (time() - longhorn_volume_last_backup_at > 26 * 3600) and longhorn_volume_last_backup_at > 0
+          for: 5m
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} ({{ $labels.pvc_namespace }}/{{ $labels.pvc }}) has no backup newer than 26h
+          labels:
+            severity: warning
+
+        - alert: LonghornNodeStorageWarning
+          expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) * 100 > 70
+          for: 5m
+          annotations:
+            summary: Longhorn storage on node {{ $labels.node }} is {{ $value | humanize }}% used
+          labels:
+            severity: warning
+
+        - alert: LonghornDiskStorageWarning
+          expr: (longhorn_disk_usage_bytes / longhorn_disk_capacity_bytes) * 100 > 70
+          for: 5m
+          annotations:
+            summary: Longhorn disk {{ $labels.disk }} on node {{ $labels.node }} is {{ $value | humanize }}% used
+          labels:
+            severity: warning
+
+        - alert: LonghornNodeDown
+          # Of limited use on one node (Longhorn goes down with it), harmless.
+          expr: (avg(longhorn_node_count_total) or on() vector(0)) - (count(longhorn_node_status{condition="ready"} == 1) or on() vector(0)) > 0
+          for: 5m
+          annotations:
+            summary: "{{ $value }} Longhorn node(s) not ready"
+          labels:
+            severity: critical
+
+        - alert: LonghornInstanceManagerCPUUsageWarning
+          expr: (longhorn_instance_manager_cpu_usage_millicpu / longhorn_instance_manager_cpu_requests_millicpu) * 100 > 300
+          for: 5m
+          annotations:
+            summary: Longhorn instance manager {{ $labels.instance_manager }} on {{ $labels.node }} uses {{ $value | humanize }}% of its CPU request
+          labels:
+            severity: warning
+
+        - alert: LonghornNodeCPUUsageWarning
+          expr: (longhorn_node_cpu_usage_millicpu / longhorn_node_cpu_capacity_millicpu) * 100 > 90
+          for: 5m
+          annotations:
+            summary: Longhorn node {{ $labels.node }} CPU is {{ $value | humanize }}% used
+          labels:
+            severity: warning

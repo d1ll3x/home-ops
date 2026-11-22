@@ -1,8 +1,11 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/snapshot.storage.k8s.io/volumesnapshotclass_v1.json
+# CSI VolumeSnapshots as Longhorn in-cluster snapshots (type: snap), not backups.
 apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:
-  name: miroir
-driver: miroir.home-operations.com
+  name: longhorn
+driver: driver.longhorn.io
 deletionPolicy: Delete
+parameters:
+  type: snap
