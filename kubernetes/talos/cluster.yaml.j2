@@ -16,11 +16,36 @@ cluster:
     endpoint: https://k8s.tebbenet.nl:6443
   token: {{ ENV.CLUSTER_TOKEN }}
 ---
+# NIC roles. Both NICs use driver r8169, so the PCI vendor:device ID tells
+# them apart; unlike a MAC it is the same on every node with this hardware.
+# pciid is the sysfs PCI_ID, uppercase hex (exact match, so no case trap).
+#
+# net0, the onboard 1 GbE RTL8168: all node traffic (bond0: server VLAN,
+# IoT VLAN, kubelet, etcd, BGP). Kept apart from storage so a replica
+# rebuild can't starve etcd heartbeats or BGP keepalives. r8169 allows up to
+# ~9K MTU on RTL8168d and later, so bond0 keeps mtu 9000.
 apiVersion: v1alpha1
 kind: LinkAliasConfig
 name: net0
 selector:
-  match: link.driver == "r8169" && mac(link.permanent_addr).startsWith("00:e0:4c")
+  match: link.pciid == "10EC:8168"
+---
+# storage0, the 2.5 GbE RTL8125: reserved for Longhorn replica traffic (#26).
+# A Talos alias is only the link's IFLA_IFALIAS, usable in Talos documents;
+# the kernel name stays enp2s0. Cilium (devices: bond+) matches kernel names,
+# so it ignores this NIC, and a Multus master in #26 must say enp2s0.
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: storage0
+selector:
+  match: link.pciid == "10EC:8125"
+---
+# Up, but no address and no DHCP: nothing routes over it until #26 adds the
+# storage VLAN and Multus network. MTU stays at the default 1500 until then.
+apiVersion: v1alpha1
+kind: LinkConfig
+name: storage0
+up: true
 ---
 apiVersion: v1alpha1
 kind: BondConfig
