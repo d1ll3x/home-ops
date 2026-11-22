@@ -1,20 +1,13 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
-# Opt-in backups: only volumes labelled recurring-job-group.longhorn.io/backup
-# (components/longhorn/backup) join. Not the "default" group, which Longhorn
-# applies to every unlabelled volume and would back up Prometheus too.
-# The snapshot each backup takes is removed afterwards
-# (setting auto-cleanup-recurring-job-backup-snapshot, default true).
+# Opt-in: only volumes in the "backup" group (components/longhorn/backup) are backed up
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
   name: backup-daily
 spec:
   concurrency: 1
-  # UTC: Longhorn creates a CronJob without timeZone, so it runs on the
-  # kube-controller-manager's clock (UTC on Talos), and CRON_TZ is rejected.
-  # 02:00 UTC is 03:00 Europe/Amsterdam in winter (CET), 04:00 in summer
-  # (CEST). A fixed UTC time was chosen over setting TZ on the controller-manager.
+  # UTC (no timeZone on Longhorn's CronJob): 03:00 CET, 04:00 CEST
   cron: "0 2 * * *"
   groups:
     - backup
@@ -23,8 +16,7 @@ spec:
   task: backup
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/recurringjob_v1beta2.json
-# Talos's FilesystemTrimConfig trims host filesystems only, not the ext4 inside
-# Longhorn volumes; this returns freed blocks to the Longhorn disk.
+# Talos trims host filesystems only; this trims the filesystems inside Longhorn volumes
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:

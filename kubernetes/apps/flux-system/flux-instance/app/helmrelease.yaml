@@ -55,8 +55,7 @@ spec:
                             target:
                               group: helm.toolkit.fluxcd.io
                               kind: HelmRelease
-                              # A HelmRelease labelled home-ops/helm-defaults: skip
-                              # (longhorn: no rollback) sets these itself.
+                              # HelmReleases labelled home-ops/helm-defaults: skip set these themselves
                               labelSelector: home-ops/helm-defaults notin (skip)
                     target:
                       group: kustomize.toolkit.fluxcd.io

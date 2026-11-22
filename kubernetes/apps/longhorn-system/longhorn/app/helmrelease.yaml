@@ -5,31 +5,26 @@ kind: HelmRelease
 metadata:
   name: longhorn
   labels:
-    # Opts out of the HelmRelease defaults patch in flux-instance (its
-    # RemediateOnFailure rollback); see upgrade below.
+    # Opts out of the flux-instance HelmRelease defaults (rollback on failure)
     home-ops/helm-defaults: skip
 spec:
   chartRef:
     kind: OCIRepository
     name: longhorn
   interval: 1h
-  # Longhorn's upgrade waits on its manager DaemonSet and hook jobs; the 5m
-  # default is too short on a busy node.
+  # The upgrade waits on the manager DaemonSet and hook jobs; 5m is too short
   timeout: 15m
-  # Longhorn can't be downgraded: a rollback after a failed or timed-out
-  # upgrade leaves storage down. So never roll back; retry the upgrade instead.
+  # Longhorn can't be downgraded, so retry a failed upgrade instead of rolling back
   upgrade:
     strategy:
       name: RetryOnFailure
   values:
     defaultBackupStore:
-      # Encryption is the bucket's default (Scaleway-managed keys); Longhorn sends no SSE headers.
+      # Encrypted by the bucket default (Scaleway-managed keys)
       backupTarget: s3://longhorn@nl-ams/
       backupTargetCredentialSecret: longhorn-backup-secret
     defaultSettings:
-      # Recurring backups attach a detached volume (e.g. a scaled-to-zero app)
-      # to back it up. A pod starting meanwhile may wait for the backup, or
-      # interrupt it; an interrupted backup is retried the next night.
+      # Back up scaled-to-zero apps too; an interrupted backup retries the next night
       allowRecurringJobWhileVolumeDetached: true
       defaultDataPath: /var/mnt/longhorn # the Talos UserVolumeConfig "longhorn"
       defaultReplicaCount: 1 # one node until M10 (#26); 3 would leave every volume degraded
@@ -42,8 +37,7 @@ spec:
       serviceMonitor:
         enabled: true
     persistence:
-      # The chart-managed "longhorn" class: the manager reconciles it from a
-      # ConfigMap, so raising the replica count in M10 is a values change.
+      # The chart-managed "longhorn" class; raise its replica count here in M10
       defaultClass: true
       defaultClassReplicaCount: 1
       defaultDataLocality: best-effort

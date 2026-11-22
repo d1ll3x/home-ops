@@ -1,8 +1,6 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
-# Its Degraded/Faulted stat panels query robustness= instead of the state= label
-# that Longhorn 1.11+ uses, so they always read 0 on 1.13. Volume health comes
-# from the alert rules in prometheusrule.yaml instead.
+# Its Degraded/Faulted panels query a pre-1.11 label and always read 0; trust the alerts
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:

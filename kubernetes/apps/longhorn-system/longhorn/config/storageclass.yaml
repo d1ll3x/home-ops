@@ -1,8 +1,6 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/storage.k8s.io/storageclass_v1.json
-# Local-only volumes: one replica that stays on the pod's node. For data that is
-# replicated or disposable at the application level (CNPG, Prometheus), so it
-# never takes the network path. Replicated volumes use the chart's "longhorn" class.
+# Local-only volumes for data the app replicates or can lose (CNPG, Prometheus)
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

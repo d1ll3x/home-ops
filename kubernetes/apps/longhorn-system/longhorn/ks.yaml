@@ -9,8 +9,7 @@ spec:
     # Longhorn's csi-snapshotter sidecar needs the VolumeSnapshot CRDs
     - name: snapshot-controller
       namespace: kube-system
-  # Only the HelmRelease gates readiness. `wait: true` would also wait on the
-  # backup ExternalSecret, so a missing BWS secret would block every StorageClass.
+  # Not wait: true, so a missing backup secret can't block the StorageClasses
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease

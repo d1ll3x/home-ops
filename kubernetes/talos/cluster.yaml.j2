@@ -145,12 +145,7 @@ labels:
   node.kubernetes.io/gpu: "true"
   topology.kubernetes.io/region: main
 ---
-# No extraMounts for Longhorn: since Talos 1.14 the kubelet already bind-mounts
-# /var/mnt read-only (rbind, rslave, ro). That's enough: Longhorn's
-# instance-manager writes /var/mnt/longhorn through its own host / mount, and
-# CSI volume mounts live under /var/lib/kubelet (rshared, rw).
-# Longhorn's Talos page suggests machine.kubelet.extraMounts; that legacy field
-# conflicts with this document and must not come back.
+# No extraMounts for Longhorn: Talos 1.14 already mounts /var/mnt into the kubelet
 apiVersion: v1alpha1
 kind: KubeletConfig
 config:

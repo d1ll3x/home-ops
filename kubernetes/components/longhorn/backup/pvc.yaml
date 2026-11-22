@@ -1,7 +1,5 @@
 ---
-# A PVC named ${APP} that joins Longhorn's opt-in "backup" recurring-job group
-# (daily backup to Scaleway, 14 kept). The app mounts it as existingClaim: ${APP}.
-# Needs postBuild.substitute.APP and dependsOn longhorn-config (longhorn-system).
+# PVC ${APP} in the daily "backup" group; needs APP and dependsOn longhorn-config
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

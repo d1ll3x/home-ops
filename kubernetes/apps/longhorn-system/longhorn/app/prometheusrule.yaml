@@ -1,11 +1,6 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
-# Based on https://longhorn.io/docs/1.13.0/monitoring/alert-rules-example/, with fixes:
-# since v1.11, longhorn_volume_robustness is one 0/1 series per `state` label,
-# so upstream's `== 2` / `== 3` never match.
-# Not included: an alert for volumes in the backup group that were never backed
-# up. Longhorn's metrics don't carry the recurring-job group, so it can't be
-# scoped; LonghornVolumeBackupStale covers volumes after their first backup.
+# From https://longhorn.io/docs/1.13.0/monitoring/alert-rules-example/, fixed for the v1.11+ state label
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -47,8 +42,7 @@ spec:
             severity: warning
 
         - alert: LonghornBackupFailed
-          # 4 = Error. Failed backups are deleted after failedBackupTTL (24h by
-          # default), which also clears this alert.
+          # 4 = Error; clears when failedBackupTTL (24h) deletes the failed backup
           expr: longhorn_backup_state == 4
           for: 5m
           annotations:
@@ -57,8 +51,7 @@ spec:
             severity: critical
 
         - alert: LonghornVolumeBackupStale
-          # Daily backups; 26h leaves room for a slow run. 0 means never backed
-          # up, so those volumes are excluded.
+          # Daily backups plus 2h slack; 0 (never backed up) is excluded
           expr: (time() - longhorn_volume_last_backup_at > 26 * 3600) and longhorn_volume_last_backup_at > 0
           for: 5m
           annotations:
