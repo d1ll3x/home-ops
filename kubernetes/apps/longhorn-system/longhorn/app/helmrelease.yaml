@@ -4,11 +4,23 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: longhorn
+  labels:
+    # Opts out of the HelmRelease defaults patch in flux-instance (its
+    # RemediateOnFailure rollback); see upgrade below.
+    home-ops/helm-defaults: skip
 spec:
   chartRef:
     kind: OCIRepository
     name: longhorn
   interval: 1h
+  # Longhorn's upgrade waits on its manager DaemonSet and hook jobs; the 5m
+  # default is too short on a busy node.
+  timeout: 15m
+  # Longhorn can't be downgraded: a rollback after a failed or timed-out
+  # upgrade leaves storage down. So never roll back; retry the upgrade instead.
+  upgrade:
+    strategy:
+      name: RetryOnFailure
   values:
     defaultBackupStore:
       # Encryption is the bucket's default (Scaleway-managed keys); Longhorn sends no SSE headers.
