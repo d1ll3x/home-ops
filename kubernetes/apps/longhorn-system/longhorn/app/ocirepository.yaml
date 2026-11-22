@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.toolkit.fluxcd.io/ocirepository_v1.json
+# Longhorn publishes its chart only to the Helm repository charts.longhorn.io;
+# there is no upstream OCI chart yet (longhorn/longhorn#9450). This is the
+# home-operations mirror of that chart (content identical to the upstream
+# 1.13.0 tgz). Switch to the upstream OCI chart once it exists.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: longhorn
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 1.13.0
+  url: oci://ghcr.io/home-operations/charts-mirror/longhorn
