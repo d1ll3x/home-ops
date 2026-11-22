@@ -15,8 +15,8 @@ provisioning:
   maxSize: 100GiB
 ---
 apiVersion: v1alpha1
-kind: RawVolumeConfig
-name: miroir-slow
+kind: UserVolumeConfig
+name: longhorn # mounted at /var/mnt/longhorn, partition label u-longhorn
 provisioning:
   diskSelector:
     match: disk.model == "CT1000P3SSD8"
