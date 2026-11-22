@@ -40,8 +40,11 @@ name: storage0
 selector:
   match: link.pciid == "10EC:8125"
 ---
-# Up, but no address and no DHCP: nothing routes over it until #26 adds the
-# storage VLAN and Multus network. MTU stays at the default 1500 until then.
+# Up, with no DHCP and no static address, until #26 adds the storage VLAN
+# and Multus network. On its own that isn't address-less: Talos's defaults
+# (IPv6 forwarding with accept_ra=2) would SLAAC an address and an IPv6
+# route onto it from the server VLAN's router advertisements. The enp2s0
+# sysctls in SysctlConfig below prevent that. MTU stays at 1500 until #26.
 apiVersion: v1alpha1
 kind: LinkConfig
 name: storage0
@@ -144,6 +147,15 @@ params:
   net.ipv4.tcp_slow_start_after_idle: "0"
   net.ipv4.tcp_wmem: 4096 65536 33554432
   net/ipv6/conf/bond0.50/disable_ipv6: "1" # keep the host off IPv6 on the IoT segment
+  # enp2s0 is the storage NIC (alias storage0; sysctls need the kernel name).
+  # It sits on the server VLAN with no IPv4 until #26. arp_ignore=1 makes it
+  # answer ARP only for addresses configured on itself: with the default 0 it
+  # would also answer for the node IP on bond0 (ARP flux), and the gateway
+  # could cache enp2s0's MAC and blackhole node, BGP and LoadBalancer traffic,
+  # which Cilium only handles on bond+. disable_ipv6 stops SLAAC addresses and
+  # routes on it. macvlan children in pod network namespaces are unaffected.
+  net.ipv4.conf.enp2s0.arp_ignore: "1"
+  net.ipv6.conf.enp2s0.disable_ipv6: "1"
   sunrpc.tcp_max_slot_table_entries: "128"
   sunrpc.tcp_slot_table_entries: "128"
   user.max_user_namespaces: "11255"
