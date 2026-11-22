@@ -12,3 +12,20 @@ resources:
   - ./gatus-sidecar/ks.yaml
   - ./grafana-operator/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
+
+patches:
+  # node-exporter runs with hostNetwork, hostPID and hostPath mounts. Talos
+  # sets no Pod Security admission default today; the label is explicit, so a
+  # future PSA default can't break node-exporter.
+  # Strategic merge only adds these labels; `name: _` is ignored because `target` selects the Namespace.
+  - target:
+      kind: Namespace
+    patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: _
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
