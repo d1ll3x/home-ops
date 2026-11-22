@@ -2,9 +2,7 @@
 parallel = true
 skip = ["merge", "rebase"]
 
-# mise fmt rewrites the config in place on every run, and a mise lock that
-# reads it mid-rewrite prunes every tool from the lockfile, so the two run
-# piped while the rest of pre-commit stays parallel.
+# Sequential: mise lock reading the config mid-fmt prunes every tool from the lockfile
 [[pre-commit.jobs]]
 name = "mise"
 glob = [".mise/config.toml", ".mise/conf.d/*.toml"]
@@ -32,12 +30,9 @@ glob = [
   "*.yaml",
   "*.yml",
 ]
-# mise lock sidecars are digest-pinned in mise.lock; reformatting them makes
-# `mise install --locked` fail with a digest mismatch.
+# Lock sidecars are digest-pinned; reformatting breaks `mise install --locked`
 exclude = [".mise/locks/**"]
-# oxfmt exits non-zero when every path it was given is on its own ignore list
-# (e.g. a commit touching only .vscode/settings.json); told not to, it formats
-# nothing and exits zero.
+# Exit zero when every staged path is on oxfmt's ignore list
 run = "oxfmt --no-error-on-unmatched-pattern {staged_files}"
 stage_fixed = true
 
