@@ -15,10 +15,18 @@ spec:
           - name: alertname
             value: InfoInhibitor
             matchType: =
-      # Watchdog always fires. Re-sending it every few minutes to Gatus is the
-      # heartbeat: if Prometheus or Alertmanager dies, the pushes stop and Gatus
-      # notifies Pushover itself. A repeat (2m30s, sent on the next 2m group tick)
-      # stays well inside Gatus's 5m heartbeat interval.
+      # Info alerts are never paged. The inhibit rule below mutes them while
+      # InfoInhibitor fires; this route drops any that get through.
+      - receiver: blackhole
+        matchers:
+          - name: severity
+            value: info
+            matchType: =
+      # Watchdog always fires. Re-sending it to Gatus is the heartbeat: if
+      # Prometheus or Alertmanager dies, the pushes stop and Gatus notifies
+      # Pushover itself. A repeat is due after repeatInterval (2m30s) but only
+      # goes out on the next groupInterval (2m) tick, so a push every ~4 min,
+      # inside Gatus's 5m heartbeat interval.
       - receiver: gatus-heartbeat
         groupInterval: 2m
         groupWait: 0s
@@ -40,6 +48,18 @@ spec:
     groupWait: 1m
 
   inhibitRules:
+    # kube-prometheus-stack's InfoInhibitor fires while a namespace has info
+    # alerts but nothing more severe; it mutes those info alerts.
+    - equal:
+        - namespace
+      sourceMatch:
+        - name: alertname
+          value: InfoInhibitor
+          matchType: =
+      targetMatch:
+        - name: severity
+          value: info
+          matchType: =
     - equal:
         - alertname
         - namespace
