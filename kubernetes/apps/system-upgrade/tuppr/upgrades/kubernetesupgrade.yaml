@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/tuppr.home-operations.com/kubernetesupgrade_v1alpha1.json
+apiVersion: tuppr.home-operations.com/v1alpha1
+kind: KubernetesUpgrade
+metadata:
+  name: kubernetes
+spec:
+  kubernetes:
+    # Must equal k8s_version in kubernetes/talos/version.yaml
+    # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+    version: v1.37.1
+  healthChecks:
+    # Detached volumes report unknown; degraded or faulted ones block the upgrade
+    - apiVersion: longhorn.io/v1beta2
+      kind: Volume
+      expr: |-
+        !has(status.robustness) || status.robustness in ['healthy', 'unknown']
+    # Passes vacuously while no Postgres cluster exists; hibernated ones are skipped
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      expr: |-
+        (has(object.metadata.annotations) && 'cnpg.io/hibernation' in object.metadata.annotations &&
+        object.metadata.annotations['cnpg.io/hibernation'] == 'on') ||
+        has(status.readyInstances) && status.readyInstances == object.spec.instances &&
+        has(status.conditions) && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')

@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/tuppr.home-operations.com/talosupgrade_v1alpha1.json
+apiVersion: tuppr.home-operations.com/v1alpha1
+kind: TalosUpgrade
+metadata:
+  name: talos
+spec:
+  talos:
+    # Must equal talos_version in kubernetes/talos/version.yaml
+    # renovate: datasource=custom.talos-factory depName=siderolabs/talos
+    version: v1.14.4
+  policy:
+    # Skip kexec for a full firmware reboot, which resets the iGPU and NIC
+    rebootMode: powercycle
+  healthChecks:
+    # Detached volumes report unknown; degraded or faulted ones block the reboot
+    - apiVersion: longhorn.io/v1beta2
+      kind: Volume
+      expr: |-
+        !has(status.robustness) || status.robustness in ['healthy', 'unknown']
+    # Passes vacuously while no Postgres cluster exists; hibernated ones are skipped
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      expr: |-
+        (has(object.metadata.annotations) && 'cnpg.io/hibernation' in object.metadata.annotations &&
+        object.metadata.annotations['cnpg.io/hibernation'] == 'on') ||
+        has(status.readyInstances) && status.readyInstances == object.spec.instances &&
+        has(status.conditions) && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')

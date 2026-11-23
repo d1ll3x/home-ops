@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tuppr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: tuppr
+  interval: 1h
+  values:
+    replicaCount: 1 # a leader-election standby only helps with more than one node; raise in M10
+    rbac:
+      # Read only what the health checks use; the default reads every resource, Secrets included
+      healthCheckRules:
+        - apiGroups: ["longhorn.io"]
+          resources: ["volumes"]
+          verbs: ["get", "list", "watch"]
+        - apiGroups: ["postgresql.cnpg.io"]
+          resources: ["clusters"]
+          verbs: ["get", "list", "watch"]
+    monitoring:
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana

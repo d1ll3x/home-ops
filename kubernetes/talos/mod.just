@@ -43,12 +43,16 @@ shutdown-node node *args:
 
 [confirm('Upgrade Kubernetes to ' + version + ' [y|N] ?')]
 [doc('Upgrade Kubernetes version on the cluster')]
-upgrade-k8s version:
+upgrade-k8s version: assert-tuppr-versions
+    if [[ "{{ version }}" != "$(just talos k8s-version)" ]]; then
+        just log error "Version differs from k8s_version in version.yaml; tuppr would revert it" "version" "{{ version }}"
+        exit 1
+    fi
     talosctl -n "$(talosctl config info -o yaml | yq -r -e '.endpoints[0]')" upgrade-k8s --to {{ version }}
 
 [confirm('Upgrade node ' + node + ' [y|N] ?')]
 [doc('Upgrade Talos version on a node')]
-upgrade-node node *args:
+upgrade-node node *args: assert-tuppr-versions
     talosctl -n "{{ node }}" upgrade -i "$(just talos machine-image "{{ node }}")" -m powercycle --timeout=10m {{ args }}
 
 [doc('Download Talos machine image')]
@@ -58,6 +62,17 @@ download-image version node="":
         -o "{{ source_directory() }}/talos-{{ version }}-${SCHEMATIC:0:8}.iso" \
         "https://factory.talos.dev/image/${SCHEMATIC}/{{ version }}/metal-amd64.iso"
     just log info "Downloaded Talos" version "{{ version }}" schematic "${SCHEMATIC}"
+
+[doc('Fail unless version.yaml matches the tuppr upgrade resources')]
+[private]
+assert-tuppr-versions:
+    upgrades="{{ source_directory() }}/../apps/system-upgrade/tuppr/upgrades"
+    talos="$(yq -r -e '.spec.talos.version' "${upgrades}/talosupgrade.yaml")"
+    k8s="$(yq -r -e '.spec.kubernetes.version' "${upgrades}/kubernetesupgrade.yaml")"
+    if [[ "${talos}" != "$(just talos talos-version)" || "${k8s}" != "$(just talos k8s-version)" ]]; then
+        just log error "version.yaml and the tuppr upgrade resources disagree; tuppr would revert a manual upgrade" "tuppr-talos" "${talos}" "tuppr-k8s" "${k8s}"
+        exit 1
+    fi
 
 [doc('Fetch Talos version from configuration')]
 [private]
