@@ -12,6 +12,8 @@ spec:
   values:
     replicaCount: 2
     config:
+      # Pure reflector: callers can't set response headers (e.g. a Set-Cookie for the whole domain)
+      commandsEnabled: false
       kubernetes: true
       trustedProxies:
         # Pod CIDR (Talos podSubnets): Envoy proxies forward from pod IPs
