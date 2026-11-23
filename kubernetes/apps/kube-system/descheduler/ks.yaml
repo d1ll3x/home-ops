@@ -5,6 +5,9 @@ kind: Kustomization
 metadata:
   name: descheduler
 spec:
+  dependsOn:
+    # LowNodeUtilization reads real usage from the metrics.k8s.io API
+    - name: metrics-server
   interval: 1h
   path: ./kubernetes/apps/kube-system/descheduler/app
   prune: true

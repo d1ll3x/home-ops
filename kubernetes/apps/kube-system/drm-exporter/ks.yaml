@@ -5,6 +5,9 @@ kind: Kustomization
 metadata:
   name: drm-exporter
 spec:
+  dependsOn:
+    # Provides the gpu.intel.com DeviceClass its ResourceClaimTemplate needs
+    - name: intel-gpu-resource-driver
   interval: 1h
   path: ./kubernetes/apps/kube-system/drm-exporter/app
   prune: true
