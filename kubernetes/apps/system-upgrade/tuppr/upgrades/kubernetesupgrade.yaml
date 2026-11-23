@@ -14,10 +14,12 @@ spec:
     - apiVersion: longhorn.io/v1beta2
       kind: Volume
       expr: |-
-        status.robustness in ['healthy', 'unknown']
-    # Passes vacuously while no Postgres cluster exists
+        !has(status.robustness) || status.robustness in ['healthy', 'unknown']
+    # Passes vacuously while no Postgres cluster exists; hibernated ones are skipped
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
       expr: |-
+        (has(object.metadata.annotations) && 'cnpg.io/hibernation' in object.metadata.annotations &&
+        object.metadata.annotations['cnpg.io/hibernation'] == 'on') ||
         has(status.readyInstances) && status.readyInstances == object.spec.instances &&
         has(status.conditions) && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
