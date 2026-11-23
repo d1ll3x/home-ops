@@ -1,0 +1,142 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "github>home-operations/renovate-presets#12.0.0",
+    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#12.0.0",
+    "github>home-operations/renovate-presets//apps/talosFactory.json5#12.0.0",
+    ":timezone(Europe/Amsterdam)",
+  ],
+  // main does not require up-to-date branches; `auto` would rebase every automerge PR as main moves
+  rebaseWhen: "conflicted",
+  // Safe-mode `mise lock` needs this mise; older ones skip the lock file update
+  constraints: { mise: ">=2026.7.12" },
+  packageRules: [
+    // Auto-merge rules: ignoreTests false keeps them inert until CI adds status checks
+    {
+      description: "Auto-merge trusted OCI digests",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["digest"],
+      matchPackageNames: ["/home-operations/"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
+    {
+      description: "Auto-merge high-cadence OCI packages weekly",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["minor", "patch"],
+      matchPackageNames: ["/kube-prometheus-stack/"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+      schedule: ["before 6am on Monday"],
+    },
+    {
+      description: "Auto-merge GitHub Actions",
+      matchManagers: ["github-actions"],
+      matchUpdateTypes: ["minor", "patch", "digest"],
+      // 0.x minors are breaking in the preset; leave those for review
+      matchCurrentVersion: "!/^v?0/",
+      automerge: true,
+      automergeType: "pr",
+      minimumReleaseAge: "3 days",
+      ignoreTests: false,
+    },
+    {
+      description: "Auto-merge trusted GitHub Actions",
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["/^actions\\//"],
+      matchUpdateTypes: ["minor", "patch", "digest"],
+      matchCurrentVersion: "!/^v?0/",
+      automerge: true,
+      automergeType: "pr",
+      minimumReleaseAge: "1 minute",
+      ignoreTests: false,
+    },
+    {
+      description: "Auto-merge Grafana dashboards",
+      matchDatasources: ["custom.grafana-dashboards"],
+      matchUpdateTypes: ["major"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
+    {
+      description: "Auto-merge Renovate presets",
+      matchManagers: ["renovate-config"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
+    // Commit message rules
+    {
+      description: "Name Terraform provider and module updates",
+      matchDatasources: ["terraform-provider", "terraform-module"],
+      semanticCommitScope: "terraform",
+      commitMessageTopic: "{{packageName}}",
+    },
+    // Grouping rules: later rules win, so the Talos and Kubernetes groups follow the mise group
+    {
+      description: "Flux Operator Group",
+      groupName: "flux-operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/flux-operator/", "/flux-instance/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "Mise Tools Group",
+      matchManagers: ["mise"],
+      groupName: "mise tools",
+      groupSlug: "mise-tools",
+    },
+    {
+      // Kubelet pins every control-plane image through k8s_version; kubectl moves with it
+      description: "Kubernetes Group",
+      groupName: "kubernetes",
+      matchPackageNames: ["ghcr.io/siderolabs/kubelet", "kubernetes/kubernetes"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      // A lone kubectl bump can open first while the kubelet image lags; a CLI one patch ahead is harmless
+      minimumGroupSize: 2,
+      separateMinorPatch: true,
+      // One PR per minor: Kubernetes upgrades can't skip a minor
+      separateMultipleMinor: true,
+    },
+    {
+      // Unites the factory installer version and talosctl
+      description: "Talos Group",
+      groupName: "talos",
+      matchPackageNames: ["siderolabs/talos"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      // A lone talosctl bump can open first while the factory lags; a CLI one patch ahead is harmless
+      minimumGroupSize: 2,
+      separateMinorPatch: true,
+      // One PR per minor: Talos upgrades can't skip a minor
+      separateMultipleMinor: true,
+    },
+    // Labeling rules
+    {
+      matchUpdateTypes: ["major"],
+      addLabels: ["type/major"],
+    },
+    {
+      matchUpdateTypes: ["minor"],
+      addLabels: ["type/minor"],
+    },
+    {
+      matchUpdateTypes: ["patch"],
+      addLabels: ["type/patch"],
+    },
+    {
+      matchUpdateTypes: ["digest"],
+      addLabels: ["type/digest"],
+    },
+  ],
+}
