@@ -14,7 +14,7 @@ spec:
   path: ./kubernetes/apps/external-dns/unifi/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: unifi
     namespace: flux-system
   targetNamespace: external-dns

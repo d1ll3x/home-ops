@@ -26,7 +26,7 @@ spec:
   path: ./kubernetes/apps/external-secrets/bitwarden-secrets-manager/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: bitwarden-secrets-manager
     namespace: flux-system
   targetNamespace: external-secrets

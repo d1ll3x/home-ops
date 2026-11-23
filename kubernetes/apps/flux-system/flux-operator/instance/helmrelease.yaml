@@ -13,6 +13,12 @@ spec:
     commonAnnotations:
       fluxcd.controlplane.io/reconcileArtifactEvery: 1h
     instance:
+      components:
+        - source-controller
+        - kustomize-controller
+        - helm-controller
+        - notification-controller
+        - source-watcher
       cluster:
         networkPolicy: false
       sync:
@@ -57,6 +63,7 @@ spec:
                               kind: HelmRelease
                               # HelmReleases labelled home-ops/helm-defaults: skip set these themselves
                               labelSelector: home-ops/helm-defaults notin (skip)
+                        retryInterval: 2m
                     target:
                       group: kustomize.toolkit.fluxcd.io
                       kind: Kustomization

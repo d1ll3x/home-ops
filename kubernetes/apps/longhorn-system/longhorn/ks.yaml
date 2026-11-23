@@ -19,8 +19,8 @@ spec:
   path: ./kubernetes/apps/longhorn-system/longhorn/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: longhorn
     namespace: flux-system
   targetNamespace: longhorn-system
 ---
@@ -37,8 +37,8 @@ spec:
   path: ./kubernetes/apps/longhorn-system/longhorn/config
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: longhorn
     namespace: flux-system
   targetNamespace: longhorn-system
   wait: true
