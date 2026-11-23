@@ -8,6 +8,8 @@
   ],
   // main does not require up-to-date branches; `auto` would rebase every automerge PR as main moves
   rebaseWhen: "conflicted",
+  // Safe-mode `mise lock` needs this mise; older ones skip the lock file update
+  constraints: { mise: ">=2026.7.12" },
   packageRules: [
     // Auto-merge rules: ignoreTests false keeps them inert until CI adds status checks
     {
@@ -33,6 +35,8 @@
       description: "Auto-merge GitHub Actions",
       matchManagers: ["github-actions"],
       matchUpdateTypes: ["minor", "patch", "digest"],
+      // 0.x minors are breaking in the preset; leave those for review
+      matchCurrentVersion: "!/^v?0/",
       automerge: true,
       automergeType: "pr",
       minimumReleaseAge: "3 days",
@@ -43,6 +47,7 @@
       matchManagers: ["github-actions"],
       matchPackageNames: ["/^actions\\//"],
       matchUpdateTypes: ["minor", "patch", "digest"],
+      matchCurrentVersion: "!/^v?0/",
       automerge: true,
       automergeType: "pr",
       minimumReleaseAge: "1 minute",
@@ -96,8 +101,11 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      // A lone kubectl bump can open first while the kubelet image lags; a CLI one patch ahead is harmless
       minimumGroupSize: 2,
       separateMinorPatch: true,
+      // One PR per minor: Kubernetes upgrades can't skip a minor
+      separateMultipleMinor: true,
     },
     {
       // Unites the factory installer version and talosctl
@@ -107,8 +115,11 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      // A lone talosctl bump can open first while the factory lags; a CLI one patch ahead is harmless
       minimumGroupSize: 2,
       separateMinorPatch: true,
+      // One PR per minor: Talos upgrades can't skip a minor
+      separateMultipleMinor: true,
     },
     // Labeling rules
     {
