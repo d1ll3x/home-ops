@@ -16,26 +16,14 @@ cluster:
     endpoint: https://k8s.tebbenet.nl:6443
   token: {{ ENV.CLUSTER_TOKEN }}
 ---
-# net0: onboard 1 GbE RTL8168, all node traffic via bond0 (matched by PCI ID, uppercase)
+# net0: 2.5 GbE RTL8125 (kernel name enp2s0), all node traffic via bond0 (matched by PCI ID, uppercase)
 apiVersion: v1alpha1
 kind: LinkAliasConfig
 name: net0
 selector:
-  match: link.pciid == "10EC:8168"
----
-# storage0: 2.5 GbE RTL8125 for Longhorn replicas (#26); the kernel name stays enp2s0
-apiVersion: v1alpha1
-kind: LinkAliasConfig
-name: storage0
-selector:
   match: link.pciid == "10EC:8125"
 ---
-# Up with no address and MTU 1500 until #26; the enp2s0 sysctls below block SLAAC
-apiVersion: v1alpha1
-kind: LinkConfig
-name: storage0
-up: true
----
+# The onboard 1 GbE enp1s0 is unused: no document names it, so Talos leaves it down
 apiVersion: v1alpha1
 kind: BondConfig
 name: bond0
@@ -115,9 +103,6 @@ params:
   net.ipv4.tcp_slow_start_after_idle: "0"
   net.ipv4.tcp_wmem: 4096 65536 33554432
   net/ipv6/conf/bond0.50/disable_ipv6: "1" # keep the host off IPv6 on the IoT segment
-  # storage0 (kernel name enp2s0): no ARP flux for bond0's node IP, no SLAAC
-  net.ipv4.conf.enp2s0.arp_ignore: "1"
-  net.ipv6.conf.enp2s0.disable_ipv6: "1"
   sunrpc.tcp_max_slot_table_entries: "128"
   sunrpc.tcp_slot_table_entries: "128"
   user.max_user_namespaces: "11255"
