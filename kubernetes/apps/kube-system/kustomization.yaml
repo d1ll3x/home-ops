@@ -12,8 +12,22 @@ resources:
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
   - ./descheduler/ks.yaml
+  - ./drm-exporter/ks.yaml
   - ./intel-gpu-resource-driver/ks.yaml
+  - ./metrics-server/ks.yaml
   - ./multus/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./reloader/ks.yaml
   - ./spegel/ks.yaml
+
+patches:
+  # drm-exporter's ResourceClaim requests adminAccess, which DRA only allows in a labelled namespace
+  - target:
+      kind: Namespace
+    patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: _
+        labels:
+          resource.kubernetes.io/admin-access: "true"
