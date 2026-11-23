@@ -6,8 +6,8 @@ namespace: flux-system
 
 components:
   - ../../components/alerts
+  - ../../components/namespace
 
 resources:
-  - ./namespace.yaml
   - ./artifactgenerator.yaml
   - ./flux-operator/ks.yaml

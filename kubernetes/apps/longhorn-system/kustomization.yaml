@@ -6,7 +6,21 @@ namespace: longhorn-system
 
 components:
   - ../../components/alerts
+  - ../../components/namespace
 
 resources:
-  - ./namespace.yaml
   - ./longhorn/ks.yaml
+
+patches:
+  # Longhorn's manager, instance-manager and CSI pods are privileged
+  - target:
+      kind: Namespace
+    patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: _
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
