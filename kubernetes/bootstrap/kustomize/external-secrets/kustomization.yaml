@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: external-secrets
 
 components:
-  - ../components/namespace
+  - ../../../components/namespace
 
 resources:
   - ./secret.yaml
