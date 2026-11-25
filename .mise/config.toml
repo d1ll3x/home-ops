@@ -39,6 +39,19 @@ node = "26.13.0"
 hide = true
 run = "gum log -t rfc3339 -s -l"
 
+# Runs in the caller's directory, so callers pass template paths relative to it.
+[tasks.template]
+hide = true
+dir = "{{ cwd }}"
+usage = '''
+arg "<file>" help="Template path, or - for stdin"
+arg "[args]" var=#true help="Extra arguments for minijinja-cli"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+fnox exec -- minijinja-cli --env "$usage_file" "${args[@]}"
+'''
+
 [task_config]
 cascade = true
 shell = "bash -euo pipefail -c"
