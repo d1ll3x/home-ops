@@ -87,7 +87,8 @@ depends = [":assert-tuppr-versions"]
 usage = 'arg "<version>" help="Kubernetes version"'
 confirm = { message = "Upgrade Kubernetes to {{ usage.version }}?", default = "no" }
 run = '''
-if [[ "$usage_version" != "$(mise run //kubernetes/talos:k8s-version)" ]]; then
+k8s_version="$(mise run //kubernetes/talos:k8s-version)"
+if [[ "$usage_version" != "$k8s_version" ]]; then
     mise run //:log error "Version differs from k8s_version in version.yaml; tuppr would revert it" version "$usage_version"
     exit 1
 fi
