@@ -15,7 +15,7 @@ The proof of concept runs on a single node, **nautilus**: a control plane that a
 | GitOps             | Flux Operator + FluxInstance. Bootstrap through helmfile (Cilium, CoreDNS, Spegel, cert-manager, ESO)                                                                                      |
 | Storage & data     | Longhorn V1 (local NVMe; replicated from M10), snapshot-controller, CloudNativePG, Longhorn backups to Scaleway Object Storage                                                             |
 | Remote access      | Tailscale as a Talos extension that advertises the LoadBalancer and node IPs as subnet routes. The tailnet policy and split DNS are Terraform (`terraform/`), with state in Scaleway S3    |
-| Tooling            | mise (tool versions), just, lefthook pre-commit (oxfmt, zizmor, terraform fmt)                                                                                                             |
+| Tooling            | mise (tool versions, tasks), just, lefthook pre-commit (oxfmt, zizmor, terraform fmt)                                                                                                      |
 
 Work is tracked in [GitHub issues and milestones](https://github.com/d1ll3x/home-ops/milestones), M1 to M9: Talos → bootstrap → BGP → basics → secrets & certs → gateway & DNS → rebuild drill → storage → three nodes.
 
