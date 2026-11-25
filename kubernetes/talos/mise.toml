@@ -19,14 +19,6 @@ talosctl machineconfig patch <(printf '%s\n' "$cluster") \
     -p @<(printf '%s\n' "$node_patch")
 '''
 
-[tasks.talos-version]
-hide = true
-run = "yq -r -e '.talos_version' version.yaml"
-
-[tasks.k8s-version]
-hide = true
-run = "yq -r -e '.k8s_version' version.yaml"
-
 [tasks.schematic-file]
 hide = true
 usage = 'arg "[node]"'
@@ -58,3 +50,11 @@ talos_version="$(mise run //kubernetes/talos:talos-version)"
 k8s_version="$(mise run //kubernetes/talos:k8s-version)"
 mise run //:template cluster.yaml.j2 -D "schematic=${schematic}" -D "talos_version=${talos_version}" -D "k8s_version=${k8s_version}" | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'
 '''
+
+[tasks.talos-version]
+hide = true
+run = "yq -r -e '.talos_version' version.yaml"
+
+[tasks.k8s-version]
+hide = true
+run = "yq -r -e '.k8s_version' version.yaml"
