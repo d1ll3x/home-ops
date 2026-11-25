@@ -29,4 +29,5 @@ flux2 = "2.10.0"
 zizmor = "1.32.0"
 terraform = "1.17.2"
 tflint = "0.66.0"
+node = "26.13.0"
 "aqua:mitsuhiko/minijinja" = "3.0.5" # minijinja-cli: renders talos/*.j2 under fnox exec
