@@ -53,10 +53,8 @@ printf '%s\n' "$schematic" | curl -fsSX POST --data-binary @- "https://factory.t
 hide = true
 usage = 'arg "[node]"'
 run = '''
-node="${usage_node:-}"
-if [[ -z "$node" ]]; then
-    node="$(talosctl config info -o yaml | yq -r -e '.nodes[0]')"
-fi
-config="$(mise run //kubernetes/talos:render-config "$node")"
-printf '%s\n' "$config" | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'
+schematic="$(mise run //kubernetes/talos:schematic-id "${usage_node:-}")"
+talos_version="$(mise run //kubernetes/talos:talos-version)"
+k8s_version="$(mise run //kubernetes/talos:k8s-version)"
+mise run //:template cluster.yaml.j2 -D "schematic=${schematic}" -D "talos_version=${talos_version}" -D "k8s_version=${k8s_version}" | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'
 '''
