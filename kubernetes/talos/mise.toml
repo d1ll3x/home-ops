@@ -1,3 +1,24 @@
+[tasks.render-config]
+description = "Render Talos config for a node"
+extends = "node"
+usage = 'arg "<node>" help="Node to render the config for"'
+run = '''
+schematic="$(mise run //kubernetes/talos:schematic-id "$usage_node")"
+TALOS_VERSION="$(mise run //kubernetes/talos:talos-version)"
+K8S_VERSION="$(mise run //kubernetes/talos:k8s-version)"
+export TALOS_VERSION K8S_VERSION
+role="controlplane"
+if [[ -f "nodes/workers/${usage_node}.yaml.j2" ]]; then
+    role="workers"
+fi
+cluster="$(mise run //:template cluster.yaml.j2 -D "schematic=${schematic}" -D "talos_version=${TALOS_VERSION}" -D "k8s_version=${K8S_VERSION}")"
+role_patch="$(mise run //:template "${role}.yaml.j2")"
+node_patch="$(mise run //:template "nodes/${role}/${usage_node}.yaml.j2")"
+talosctl machineconfig patch <(printf '%s\n' "$cluster") \
+    -p @<(printf '%s\n' "$role_patch") \
+    -p @<(printf '%s\n' "$node_patch")
+'''
+
 [tasks.talos-version]
 hide = true
 run = "yq -r -e '.talos_version' version.yaml"
