@@ -63,7 +63,7 @@ cascade = true
 shell = "bash -euo pipefail -c"
 
 [monorepo]
-config_roots = ["kubernetes/bootstrap", "kubernetes/talos", "terraform"]
+config_roots = ["kubernetes/talos"]
 
 [settings]
 task.quiet = true

@@ -1,0 +1,7 @@
+[tasks.talos-version]
+hide = true
+run = "yq -r -e '.talos_version' version.yaml"
+
+[tasks.k8s-version]
+hide = true
+run = "yq -r -e '.k8s_version' version.yaml"
