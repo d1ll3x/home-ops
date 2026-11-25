@@ -8,7 +8,7 @@ The proof of concept runs on a single node, **nautilus**: a control plane that a
 
 | Area               | What's in the repo                                                                                                                                                                         |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| OS                 | Talos Linux, configured through minijinja templates (`kubernetes/talos/`), rendered and applied with `just`                                                                                |
+| OS                 | Talos Linux, configured through minijinja templates (`kubernetes/talos/`), rendered and applied with mise tasks                                                                            |
 | Networking         | Cilium with BGP to the UniFi gateway (ECMP across nodes), Multus, Envoy Gateway (`envoy-internal`)                                                                                         |
 | DNS & certificates | external-dns writes to UniFi DNS through its webhook. cert-manager gets Let's Encrypt certificates through Cloudflare DNS-01                                                               |
 | Secrets            | Bitwarden Secrets Manager. [fnox](https://github.com/jdx/fnox) injects secrets on the workstation, External Secrets Operator in the cluster. No secret material in git, not even encrypted |
