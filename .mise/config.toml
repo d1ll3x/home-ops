@@ -35,6 +35,10 @@ tflint = "0.66.0"
 node = "26.13.0"
 "aqua:mitsuhiko/minijinja" = "3.0.5" # minijinja-cli: renders talos/*.j2 under fnox exec
 
+[tasks.log]
+hide = true
+run = "gum log -t rfc3339 -s -l"
+
 [task_config]
 cascade = true
 shell = "bash -euo pipefail -c"
