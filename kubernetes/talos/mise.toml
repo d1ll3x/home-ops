@@ -5,3 +5,25 @@ run = "yq -r -e '.talos_version' version.yaml"
 [tasks.k8s-version]
 hide = true
 run = "yq -r -e '.k8s_version' version.yaml"
+
+[tasks.schematic-file]
+hide = true
+usage = 'arg "[node]"'
+run = '''
+file="schematic.yaml"
+if [[ -n "${usage_node:-}" ]]; then
+    for f in nodes/*/"${usage_node}".schematic.yaml; do
+        [[ -f "$f" ]] && file="$f"
+    done
+fi
+echo "$file"
+'''
+
+[tasks.schematic-id]
+hide = true
+usage = 'arg "[node]"'
+run = '''
+file="$(mise run //kubernetes/talos:schematic-file "${usage_node:-}")"
+schematic="$(mise run //:template "$file")"
+printf '%s\n' "$schematic" | curl -fsSX POST --data-binary @- "https://factory.talos.dev/schematics" | jq -er '.id'
+'''
