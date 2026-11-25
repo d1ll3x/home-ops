@@ -17,6 +17,3 @@ trim_trailing_whitespace = false
 [*.sh]
 indent_size = 2
 
-[{*.just,*.justfile}]
-indent_size = 2
-
