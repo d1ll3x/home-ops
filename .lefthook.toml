@@ -5,7 +5,7 @@ skip = ["merge", "rebase"]
 # Sequential: mise lock reading the config mid-fmt prunes every tool from the lockfile
 [[pre-commit.jobs]]
 name = "mise"
-glob = [".mise/config.toml", ".mise/conf.d/*.toml"]
+glob = [".config/mise.toml", ".config/mise/conf.d/*.toml"]
 
 [pre-commit.jobs.group]
 piped = true
@@ -17,7 +17,7 @@ stage_fixed = true
 
 [[pre-commit.jobs.group.jobs]]
 name = "lock-mise"
-run = 'mise lock && git add -A -- .mise ":(exclude).mise/*.toml"'
+run = 'mise lock && git add -A -- .config ":(exclude).config/*.toml"'
 
 [pre-commit.commands.format-oxfmt]
 glob = [
@@ -31,7 +31,7 @@ glob = [
   "*.yml",
 ]
 # Lock sidecars are digest-pinned; reformatting breaks `mise install --locked`
-exclude = [".mise/locks/**"]
+exclude = [".config/mise/locks/**"]
 # Exit zero when every staged path is on oxfmt's ignore list
 run = "oxfmt --no-error-on-unmatched-pattern {staged_files}"
 stage_fixed = true

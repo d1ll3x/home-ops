@@ -665,7 +665,7 @@ url = "https://nodejs.org/dist/v26.13.0/node-v26.13.0-win-x64.zip"
 
 [[tools.oxfmt]]
 version = "0.80.0"
-aube = { path = "locks/oxfmt/0.80.0", digest = "sha256:fa6a6ae0fbf529982a681ada265799f34785c81627f2d3671cd17bfd44c11d9e" }
+aube = { path = "mise/locks/oxfmt/0.80.0", digest = "sha256:fa6a6ae0fbf529982a681ada265799f34785c81627f2d3671cd17bfd44c11d9e" }
 backend = "npm:oxfmt"
 specifiers = ["0.80.0"]
 
