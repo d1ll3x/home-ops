@@ -5,20 +5,14 @@ skip = ["merge", "rebase"]
 # Sequential: mise lock reading the config mid-fmt prunes every tool from the lockfile
 [[pre-commit.jobs]]
 name = "mise"
-glob = [".mise/config.toml", ".mise/conf.d/*.toml", "**/mise.toml"]
+glob = [".mise/config.toml", ".mise/conf.d/*.toml"]
 
 [pre-commit.jobs.group]
 piped = true
 
 [[pre-commit.jobs.group.jobs]]
 name = "format-mise"
-# mise fmt skips nested configs; capturing first leaves the file untouched when it fails
-run = '''
-for f in {staged_files}; do
-  out="$(mise fmt --stdin <"$f")" || exit 1
-  printf '%s\n' "$out" >"$f"
-done
-'''
+run = "mise fmt"
 stage_fixed = true
 
 [[pre-commit.jobs.group.jobs]]
