@@ -56,5 +56,8 @@ fnox exec -- minijinja-cli --env "$usage_file" "${args[@]}"
 cascade = true
 shell = "bash -euo pipefail -c"
 
+[monorepo]
+config_roots = ["kubernetes/bootstrap", "kubernetes/talos", "terraform"]
+
 [settings]
 task.quiet = true
