@@ -1,0 +1,24 @@
+[tasks.apply]
+description = "Apply the Terraform configuration"
+interactive = true
+usage = 'arg "[args]" var=#true help="Extra arguments for terraform apply"'
+run = '''
+eval "args=(${usage_args:-})"
+fnox exec -- terraform apply "${args[@]}"
+'''
+
+[tasks.init]
+description = "Initialize the Terraform backend and providers"
+usage = 'arg "[args]" var=#true help="Extra arguments for terraform init"'
+run = '''
+eval "args=(${usage_args:-})"
+fnox exec -- terraform init -backend-config=backend.hcl "${args[@]}"
+'''
+
+[tasks.plan]
+description = "Show the Terraform plan"
+usage = 'arg "[args]" var=#true help="Extra arguments for terraform plan"'
+run = '''
+eval "args=(${usage_args:-})"
+fnox exec -- terraform plan "${args[@]}"
+'''
