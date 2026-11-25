@@ -23,9 +23,9 @@ talosctl machineconfig patch <(printf '%s\n' "$cluster") \
 hide = true
 usage = 'arg "[node]"'
 run = '''
-file="schematic.yaml"
+file="schematic.yaml.j2"
 if [[ -n "${usage_node:-}" ]]; then
-    for f in nodes/*/"${usage_node}".schematic.yaml; do
+    for f in nodes/*/"${usage_node}".schematic.yaml.j2; do
         [[ -f "$f" ]] && file="$f"
     done
 fi

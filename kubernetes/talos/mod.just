@@ -86,9 +86,9 @@ k8s-version:
 
 [private]
 schematic-file node="":
-    file="{{ source_directory() }}/schematic.yaml"
+    file="{{ source_directory() }}/schematic.yaml.j2"
     if [[ -n "{{ node }}" ]]; then
-        for f in "{{ source_directory() }}"/nodes/*/"{{ node }}".schematic.yaml; do
+        for f in "{{ source_directory() }}"/nodes/*/"{{ node }}".schematic.yaml.j2; do
             [[ -f "$f" ]] && file="$f"
         done
     fi
