@@ -16,6 +16,6 @@ terraform {
 
 # No credential variables: the provider reads TAILSCALE_OAUTH_CLIENT_ID /
 # TAILSCALE_OAUTH_CLIENT_SECRET from the environment, exported by fnox
-# (mise run //terraform:plan). Needs the policy_file and dns write scopes.
+# (fnox exec -- terraform ...). Needs the policy_file and dns write scopes.
 # The tailnet defaults to the client's own.
 provider "tailscale" {}
