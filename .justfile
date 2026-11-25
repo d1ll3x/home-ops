@@ -17,10 +17,6 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 #[group('Kube')]
 #mod kube "kubernetes"
 
-# Talos Recipes
-[group('Talos')]
-mod talos "kubernetes/talos"
-
 [private]
 log lvl msg *args:
     gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}
