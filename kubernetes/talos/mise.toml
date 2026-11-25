@@ -48,3 +48,15 @@ file="$(mise run //kubernetes/talos:schematic-file "${usage_node:-}")"
 schematic="$(mise run //:template "$file")"
 printf '%s\n' "$schematic" | curl -fsSX POST --data-binary @- "https://factory.talos.dev/schematics" | jq -er '.id'
 '''
+
+[tasks.machine-image]
+hide = true
+usage = 'arg "[node]"'
+run = '''
+node="${usage_node:-}"
+if [[ -z "$node" ]]; then
+    node="$(talosctl config info -o yaml | yq -r -e '.nodes[0]')"
+fi
+config="$(mise run //kubernetes/talos:render-config "$node")"
+printf '%s\n' "$config" | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'
+'''
