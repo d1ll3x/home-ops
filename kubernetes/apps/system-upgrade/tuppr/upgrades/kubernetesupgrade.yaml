@@ -8,7 +8,7 @@ spec:
   kubernetes:
     # Must equal k8s_version in kubernetes/talos/version.yaml
     # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-    version: v1.37.2
+    version: v1.37.3
   healthChecks:
     # Detached volumes report unknown; degraded or faulted ones block the upgrade
     - apiVersion: longhorn.io/v1beta2
